@@ -14,8 +14,9 @@ body {
 header {
     /* Záhlaví aplikace */
     background-color: #2d8659;
-    padding: 20px;
+    padding: 5px;
     text-align: center;
+    font-size: 24px;
 }
 
 nav {
@@ -35,7 +36,7 @@ nav {
 #category-button {
     /* Vlastní vzhled tlačítka výběru kategorie (pill dropdown) */
     background-color: #1f1814;
-    color: #f2eadf;
+    color: #ffffff;
     border: 1.5px solid rgba(242, 234, 223, 0.35);
     border-radius: 999px;
     padding: 20px 48px 20px 35px;
@@ -76,16 +77,21 @@ nav {
 }
 
 #category-list {
-    /* Samotný rozbalovací seznam kategorií */
+    /* Samotný rozbalovací seznam kategorií - Glassmorphism style */
     position: absolute;
-    background-color: #1f1814;
+    background: rgba(31, 24, 20, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     list-style: none;
-    padding: 0;
+    padding: 1px;
     margin: 0;
-    border: 1px solid #ccc;
+    margin-top: 1px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     z-index: 1000;
     display: block;
-    width: 200px;
+    width: 220px;
 }
 
 #category-list.hidden {
@@ -98,13 +104,23 @@ nav {
 
 #category-list li {
     /* Položky v seznamu kategorií */
-    padding: 10px;
+    padding: 12px 16px;
     cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    color: #f2eadf;
+    margin-bottom: 4px;
+}
+
+#category-list li:last-child {
+    margin-bottom: 0;
 }
 
 #category-list li:hover {
     /* Zvýraznění při najetí myší */
-    background-color: #3a9a6a;
+    background: rgba(45, 134, 89, 0.4);
+    backdrop-filter: blur(8px);
+    transform: translateX(4px);
 }
 
 #search-input {
@@ -183,6 +199,7 @@ footer {
 ::-webkit-scrollbar-thumb {
     background: #3a9a6a;
     border-radius: 5px;
+    border: 1.75px solid white;
 }
 
 ::-webkit-scrollbar-track {

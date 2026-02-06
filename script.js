@@ -39,6 +39,26 @@ const prompts = [
         category: '#excel_analysis',
         title: 'Tvorba komplexního vzorce s vysvětlením',
         content: 'Potřebuji v Excelu vytvořit vzorec pro sloupec C. Pokud je hodnota ve sloupci A větší než 1000 a zároveň hodnota ve sloupci B obsahuje text "Skladem", vypiš "Priorita", jinak "Běžné". Zároveň pokud je sloupec A prázdný, nepiš nic. Napiš mi tento vzorec a vysvětli krok za krokem, jak funguje, abych se to naučil.'
+    },
+    {
+        category: '#powerpoint_design',
+        title: 'Vytvoření prezentace z Word dokumentu',
+        content: 'Vytvoř v PowerPointu prezentaci o 10 slidech na základě připojeného dokumentu [NÁZEV SOUBORU WORD]. Jsi expert na storytelling. Každý slide musí obsahovat: Nadpis, maximálně 4 stručné odrážky obsahu a do poznámek pro přednášejícího (Speaker Notes) napiš detailní vysvětlení, co mám k danému slidu říkat. Rozvrhni prezentaci na Úvod, Problém, Řešení, Harmonogram a Závěr.'
+    },
+    {
+        category: '#powerpoint_design',
+        title: 'Vylepšení a restrukturalizace slidu',
+        content: 'Analyzuj text na aktuálním slidu. Je tam příliš mnoho textu a působí to nepřehledně. 1) Zkrať text o 50 %, aniž by se ztratila klíčová sdělení. 2) Navrhni rozdělení obsahu do vizuálních bloků nebo procesního diagramu. 3) Navrhni vhodný nadpis, který vystihuje hlavní myšlenku.'
+    },
+    {
+        category: '#project_management',
+        title: 'Status projektu napříč aplikacemi',
+        content: 'Jsi projektový manažer. Potřebuji rychlý přehled o projektu [NÁZEV PROJEKTU]. Prohledej mé e-maily, chaty v Teams a soubory na OneDrive za posledních 14 dní. Zjisti: Kdo naposledy reportoval nějaký pokrok? Zmínil někdo nějaké zdržení nebo "blocker"? Vytvoř souhrnný report o jedné stránce.'
+    },
+    {
+        category: '#project_management',
+        title: 'Analýza rizik projektu',
+        content: 'Na základě přiloženého plánu projektu [SOUBOR/TEXT] identifikuj 5 potenciálních rizik, která by mohla ohrozit termín dodání nebo rozpočet. U každého rizika odhadni pravděpodobnost (Vysoká/Střední/Nízká) a navrhni konkrétní mitigační opatření (jak riziku předejít).'
     }
 ];
 
