@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knihovna promptů</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Záhlaví stránky s názvem aplikace -->
+    <header>
+        <h1>Knihovna promptů</h1>
+    </header>
+    <!-- Navigace: výběr kategorie nebo vyhledávání -->
+    <nav>
+        <div class="category-dropdown">
+            <button id="category-button">Vyberte kategorii </button>
+            <ul id="category-list" class="hidden">
+                <li data-category="all">Všechny kategorie</li>
+                <li data-category="#briefing">#briefing</li>
+                <li data-category="#meeting_management">#meeting_management</li>
+                <li data-category="#email_productivity">#email_productivity</li>
+                <li data-category="#document_creation">#document_creation</li>
+                <li data-category="#excel_analysis">#excel_analysis</li>
+            </ul>
+        </div>
+        <span>nebo</span>
+        <input type="text" id="search-input" placeholder="Vyhledejte prompt...">
+    </nav>
+    <!-- Hlavní obsah: seznam karet s prompty -->
+    <main id="prompt-container">
+        <!-- Karty promptů budou vloženy dynamicky -->
+    </main>
+    <!-- Patička s metadaty projektu -->
+    <footer>
+        <p>Verze: 0.01</p>
+        <p>Poslední commit: 06.02.2025 </p>
+        <p>Kontakt: nilyassov@koop.cz </p>
+    </footer>
+    <!-- Načtení aplikační logiky -->
+    <script src="script.js"></script>
+</body>
+</html>

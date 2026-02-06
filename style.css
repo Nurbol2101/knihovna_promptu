@@ -1,0 +1,215 @@
+* {
+    /* Základní nastavení box modelu pro všechny prvky */
+    box-sizing: border-box;
+}
+
+body {
+    /* Globální vzhled stránky */
+    margin: 0;
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    background-color: #1a1410;
+    color: white;
+}
+
+header {
+    /* Záhlaví aplikace */
+    background-color: #2d8659;
+    padding: 20px;
+    text-align: center;
+}
+
+nav {
+    /* Horní panel s filtrováním a vyhledáváním */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    gap: 15px;
+}
+
+.category-dropdown {
+    /* Kontejner pro rozbalovací seznam kategorií */
+    position: relative;
+}
+
+#category-button {
+    /* Vlastní vzhled tlačítka výběru kategorie (pill dropdown) */
+    background-color: #1f1814;
+    color: #f2eadf;
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
+    border-radius: 999px;
+    padding: 20px 48px 20px 35px;
+    /* Adjust button width here - current min-width is 280px */
+    min-width: 75px;
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    outline: none;
+}
+
+#category-button::after {
+    /* Chevron ikona vpravo */
+    content: '▾';
+    position: absolute;
+    right: 18px;
+    font-size: 16px;
+    color: #f2eadf;
+    line-height: 1;
+}
+
+
+#category-button:hover {
+    /* Jemné zvýraznění při najetí myší */
+    border-color: rgba(242, 234, 223, 0.55);
+}
+
+#category-button:focus-visible {
+    /* Viditelné zvýraznění při fokusování */
+    border-color: rgba(242, 234, 223, 0.75);
+}
+
+#category-list {
+    /* Samotný rozbalovací seznam kategorií */
+    position: absolute;
+    background-color: #1f1814;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    display: block;
+    width: 200px;
+}
+
+#category-list.hidden {
+    display: none;
+}
+
+.category-dropdown:hover #category-list {
+    display: block;
+}
+
+#category-list li {
+    /* Položky v seznamu kategorií */
+    padding: 10px;
+    cursor: pointer;
+}
+
+#category-list li:hover {
+    /* Zvýraznění při najetí myší */
+    background-color: #3a9a6a;
+}
+
+#search-input {
+    /* Styl vyhledávacího pole */
+    padding: 16px 15px;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 5px;
+    background-color: #1f1814;
+    color: white;
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-size: 18px;
+}
+
+#prompt-container {
+    /* Mřížka karet s prompty */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.prompt-card {
+    /* Vzhled jednotlivé karty promptu */
+    background-color: #2b1f1c;
+    border: 2px solid #d1b48c;
+    border-radius: 10px;
+    padding: 15px;
+    position: relative;
+    text-align: center;
+}
+
+.prompt-card h2 {
+    /* Nadpis karty */
+    margin: 0;
+}
+
+.prompt-card .hashtag {
+    /* Štítek s kategorií */
+    /* Adjust width based on hashtag length using inline-block */
+    display: inline-block;
+    text-align: center;
+    background-color: #d1b48c;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    white-space: nowrap;
+}
+
+.prompt-card button {
+    /* Tlačítko pro kopírování */
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: #535e1c;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+footer {
+    /* Patička stránky */
+    text-align: center;
+    padding: 10px;
+    background-color: #2d865954;
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+}
+
+/* Vlastní styl posuvníku */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a9a6a;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1410;
+}
+
+/* Toast notification */
+.toast {
+    /* Pozice a základní styl */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #2d8659;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-size: 16px;
+    z-index: 10000;
+    /* Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
