@@ -75,6 +75,31 @@ function displayPrompts(filteredPrompts) {
 // Po načtení stránky zobrazí všechny prompty
 displayPrompts(prompts);
 
+// Dynamicky generuje kategorie ze souboru prompts
+function generateCategories() {
+    // Získat všechny jedinečné kategorie
+    const categories = [...new Set(prompts.map(prompt => prompt.category))].sort();
+    
+    // Vyčistit stávající kategorie (kromě "Všechny kategorie")
+    const categoryList = document.getElementById('category-list');
+    const allCategoriesItem = categoryList.querySelector('[data-category="all"]');
+    categoryList.innerHTML = '';
+    
+    // Přidat "Všechny kategorie" zpět
+    categoryList.appendChild(allCategoriesItem);
+    
+    // Přidat všechny kategorie
+    categories.forEach(category => {
+        const li = document.createElement('li');
+        li.setAttribute('data-category', category);
+        li.textContent = category;
+        categoryList.appendChild(li);
+    });
+}
+
+// Vygenerovat kategorie při načtení stránky
+generateCategories();
+
 // Vyhledávání v reálném čase podle názvu, kategorie i obsahu
 searchInput.addEventListener('input', () => {
     const searchTerm = searchInput.value.toLowerCase();
