@@ -12,11 +12,21 @@ body {
 }
 
 header {
-    /* Záhlaví aplikace */
-    background-color: #2d8659;
-    padding: 5px;
+    /* Záhlaví aplikace - iOS Liquid Glass style */
+    background: rgb(45, 134, 89);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1.5px solid rgba(242, 234, 223, 0.15);
+    padding: 15px;
     text-align: center;
     font-size: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    transition: all 0.01s ease;
+}
+
+header:hover {
+    background: rgba(45, 134, 89, 0.4);
+    border-color: rgba(242, 234, 223, 0.25);
 }
 
 nav {
@@ -107,7 +117,7 @@ nav {
     padding: 12px 16px;
     cursor: pointer;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
     color: #ffffff;
     margin-bottom: 4px;
 }
@@ -143,13 +153,25 @@ nav {
 }
 
 .prompt-card {
-    /* Vzhled jednotlivé karty promptu */
-    background-color: #2b1f1c;
-    border: 2px solid #d1b48c;
-    border-radius: 10px;
-    padding: 15px;
+    /* Vzhled jednotlivé karty promptu - iOS Liquid Glass style */
+    background: rgba(45, 38, 35, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(242, 234, 223, 0.2);
+    border-radius: 20px;
+    padding: 20px;
     position: relative;
     text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    transition: all 0.15s ease;
+}
+
+.prompt-card:hover {
+    /* Efekt při najetí myší pro moderní vzhled */
+    background: rgba(45, 38, 35, 0.5);
+    border-color: rgba(242, 234, 223, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    transform: translateY(-5px);
 }
 
 .prompt-card h2 {
@@ -158,37 +180,72 @@ nav {
 }
 
 .prompt-card .hashtag {
-    /* Štítek s kategorií */
-    /* Adjust width based on hashtag length using inline-block */
+    /* Štítek s kategorií - Glass style */
     display: inline-block;
     text-align: center;
-    background-color: #2d8659;
-    padding: 5px 10px;
-    border-radius: 5px;
+    background: rgba(33, 255, 144, 0.395);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(45, 134, 89, 0.5);
+    padding: 6px 14px;
+    border-radius: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
     white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    color: #f2eadf;
 }
 
 .prompt-card button {
-    /* Tlačítko pro kopírování */
+    /* Tlačítko pro kopírování - Glass style */
     position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: #535e1c;
-    color: white;
-    border: none;
-    border-radius: 10px;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(114, 125, 55, 0.733);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(83, 94, 28, 0.6);
+    color: #ffffff;
+    border-radius: 25px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.01s ease;
+}
+
+.prompt-card button:hover {
+    background: rgba(83, 94, 28, 0.6);
+    border-color: rgba(83, 94, 28, 0.8);
+    transform: scale(1.05);
+}
+
+.prompt-card button:active {
+    transform: scale(0.95);
 }
 
 footer {
-    /* Patička stránky */
+    /* Patička stránky - iOS Liquid Glass style */
     text-align: center;
-    padding: 10px;
-    background-color: #2d865954;
+    padding: 15px;
+    background: rgba(45, 134, 89, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1.5px solid rgba(242, 234, 223, 0.15);
     font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+    transition: all 0.01s ease;
+}
+
+footer:hover {
+    background: rgba(45, 134, 89, 0.3);
+    border-color: rgba(242, 234, 223, 0.25);
+}
+
+footer p {
+    margin: 4px 0;
 }
 
 /* Vlastní styl posuvníku */
@@ -206,7 +263,7 @@ footer {
     background: #1a1410;
 }
 
-/* Toast notification */
+/* Oznámení toast */
 .toast {
     /* Pozice a základní styl */
     position: fixed;
@@ -220,10 +277,10 @@ footer {
     font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
     font-size: 16px;
     z-index: 10000;
-    /* Animation */
+    /* Animace */
     opacity: 0;
     transform: translateY(20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .toast.show {

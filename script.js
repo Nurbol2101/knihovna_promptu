@@ -78,12 +78,12 @@ function displayPrompts(filteredPrompts) {
             <h2>${prompt.title}</h2>
             <div class="hashtag">${prompt.category}</div>
             <p>${prompt.content}</p>
-            <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat</button>
+            <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat!</button>
         `;
         promptContainer.appendChild(card);
     });
     
-    // Add event listeners to all copy buttons
+    // Přidání event listenerů na všechna tlačítka Kopírovat
     document.querySelectorAll('.copy-button').forEach(button => {
         button.addEventListener('click', function() {
             const content = this.getAttribute('data-content');
@@ -120,19 +120,24 @@ function generateCategories() {
 // Vygenerovat kategorie při načtení stránky
 generateCategories();
 
+// Funkce pro normalizaci znaků s diakritikou
+function normalizeString(str) {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 // Vyhledávání v reálném čase podle názvu, kategorie i obsahu
 searchInput.addEventListener('input', () => {
-    const searchTerm = searchInput.value.toLowerCase();
+    const searchTerm = normalizeString(searchInput.value);
     const filteredPrompts = prompts.filter(prompt => 
-        prompt.title.toLowerCase().includes(searchTerm) || 
-        prompt.category.toLowerCase().includes(searchTerm) || 
-        prompt.content.toLowerCase().includes(searchTerm)
+        normalizeString(prompt.title).includes(searchTerm) || 
+        normalizeString(prompt.category).includes(searchTerm) || 
+        normalizeString(prompt.content).includes(searchTerm)
     );
     displayPrompts(filteredPrompts);
 });
 
 // Otevře nebo zavře rozbalovací seznam kategorií
-// Disabled - hover is used instead
+// Zakázáno - je použito místo toho najetí myší
 // categoryButton.addEventListener('click', () => {
 //     categoryList.classList.toggle('hidden');
 // });
@@ -144,6 +149,8 @@ categoryList.addEventListener('click', (event) => {
         const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter(prompt => prompt.category === selectedCategory);
         displayPrompts(filteredPrompts);
         categoryList.classList.add('hidden');
+        // Aktualizace textu tlačítka, aby ukazoval vybranou kategorii
+        categoryButton.textContent = selectedCategory === 'all' ? 'Všechny kategorie' : selectedCategory;
     }
 });
 
@@ -172,3 +179,15 @@ function copyToClipboard(text) {
         showToast('Chyba při kopírování');
     });
 }
+
+// Klávesová zkratka: stisknutím H aktivuje vyhledávání
+document.addEventListener('keydown', (event) => {
+    // Zkontroluj, zda je stisknuta klávesa 'H' a není zaměřeno na žádné vstupní pole
+    if (event.key === 'h' || event.key === 'H') {
+        // Neaktivuj, pokud uživatel již píše do vstupního pole
+        if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+            event.preventDefault();
+            searchInput.focus();
+        }
+    }
+});
