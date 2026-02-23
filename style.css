@@ -6,28 +6,26 @@
 body {
     /* Globální vzhled stránky */
     margin: 0;
-    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-family: 'Calibri', sans-serif;
     background-color: #1a1410;
     color: white;
 }
 
-header {
-    /* Záhlaví aplikace - iOS Liquid Glass style */
+.hidden {
+    display: none;
+}
+
+.page-header {
+    /* Záhlaví pro přepínač stránek */
     background: rgb(45, 134, 89);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1.5px solid rgba(242, 234, 223, 0.15);
-    padding: 15px;
-    text-align: center;
-    font-size: 24px;
+    padding: 18px 20px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1);
     transition: all 0.01s ease;
 }
 
-header:hover {
-    background: rgba(45, 134, 89, 0.4);
-    border-color: rgba(242, 234, 223, 0.25);
-}
 
 nav {
     /* Horní panel s filtrováním a vyhledáváním */
@@ -35,6 +33,52 @@ nav {
     justify-content: center;
     align-items: center;
     padding: 10px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.page-toggle {
+    /* Kontejner pro tlačítka stránek */
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.page-button {
+    /* Tlačítka přepínače stránek (neaktivní stav) */
+    background: rgba(124, 76, 37, 0.6);
+        color: #ffffff7c;
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
+    border-radius: 12px;
+    padding: 30px 32px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-width: 320px;
+    text-transform: none;
+}
+
+.page-button.active {
+    /* Aktivní tlačítko stránky */
+    background: rgba(45, 134, 89, 0.7);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.page-button:hover {
+    border-color: rgba(242, 234, 223, 0.55);
+    transform: translateY(-2px);
+}
+
+.library-controls {
+    display: flex;
+    align-items: center;
     gap: 15px;
 }
 
@@ -52,9 +96,9 @@ nav {
     padding: 20px 48px 20px 35px;
     /* Adjust button width here - current min-width is 280px */
     min-width: 75px;
-    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-family: 'Calibri', sans-serif;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: bold;
     letter-spacing: 0.2px;
     cursor: pointer;
     position: relative;
@@ -140,7 +184,8 @@ nav {
     border-radius: 5px;
     background-color: #1f1814;
     color: white;
-    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-family: 'Calibri', sans-serif;
+    font-weight: bold;
     font-size: 18px;
 }
 
@@ -150,6 +195,122 @@ nav {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     padding: 20px;
+}
+
+.builder-intro {
+    /* Úvodní text builderu */
+    text-align: center;
+    padding: 10px 20px 0;
+}
+
+.builder-intro h2 {
+    margin: 10px 0 6px;
+    font-size: 28px;
+}
+
+.builder-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 20px 5px;
+}
+
+.section-add-button {
+    background: rgba(31, 24, 20, 0.7);
+    color: #ffffff;
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.section-add-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.builder-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.builder-card {
+    text-align: left;
+}
+
+.builder-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.builder-card textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 90px;
+    background-color: #1f1814;
+    color: #ffffff;
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 15px;
+}
+
+.remove-section,
+#copy-xml {
+    background: rgba(114, 125, 55, 0.733);
+    border: 1px solid rgba(83, 94, 28, 0.6);
+    color: #ffffff;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.01s ease;
+}
+
+.remove-section:hover,
+#copy-xml:hover {
+    background: rgba(83, 94, 28, 0.6);
+    border-color: rgba(83, 94, 28, 0.8);
+}
+
+.builder-output {
+    padding: 0 20px 20px;
+}
+
+.builder-output textarea {
+    width: 100%;
+    resize: vertical;
+    background-color: #1f1814;
+    color: #ffffff;
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 15px;
+}
+
+@media (max-width: 1200px) {
+    .builder-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 980px) {
+    #prompt-container,
+    .builder-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
 }
 
 .prompt-card {
@@ -164,6 +325,7 @@ nav {
     text-align: center;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.1);
     transition: all 0.15s ease;
+    font-size: 16px;
 }
 
 .prompt-card:hover {
@@ -233,7 +395,8 @@ footer {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1.5px solid rgba(242, 234, 223, 0.15);
-    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-family: 'Calibri', sans-serif;
+    font-weight: bold;
     font-size: 14px;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15), inset 0 -1px 2px rgba(255, 255, 255, 0.1);
     transition: all 0.01s ease;
@@ -274,7 +437,8 @@ footer p {
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    font-family: Futura, 'Trebuchet MS', Arial, sans-serif;
+    font-family: 'Calibri', sans-serif;
+    font-weight: bold;
     font-size: 16px;
     z-index: 10000;
     /* Animace */

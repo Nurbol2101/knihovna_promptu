@@ -2,35 +2,128 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.5">
     <title>Knihovna promptů</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Záhlaví stránky s názvem aplikace -->
-    <header>
-        <h1>Knihovna promptů</h1>
-    </header>
+    <!-- Přepínač stránky: přepíná Knihovna vs. Customní prompt -->
+    <section class="page-header">
+        <div class="page-toggle">
+            <button class="page-button active" data-page="library">Knihovna promptů</button>
+            <button class="page-button" data-page="custom">Customní prompt</button>
+        </div>
+    </section>
     <!-- Navigace: výběr kategorie nebo vyhledávání -->
     <nav>
-        <div class="category-dropdown">
-            <button id="category-button">Vyberte kategorii </button>
-            <ul id="category-list" class="hidden">
-                <li data-category="all">Všechny kategorie</li>
-            </ul>
+        <div class="library-controls">
+            <div class="category-dropdown">
+                <button id="category-button">Vyberte kategorii </button>
+                <ul id="category-list" class="hidden">
+                    <li data-category="all">Všechny kategorie</li>
+                </ul>
+            </div>
+            <span>nebo</span>
+            <input type="text" id="search-input" placeholder="Stiskni H pro hledání...">
         </div>
-        <span>nebo</span>
-        <input type="text" id="search-input" placeholder="Stiskni H pro hledání...">
     </nav>
     <!-- Hlavní obsah: seznam karet s prompty -->
-    <main id="prompt-container">
-        <!-- Karty promptů budou vloženy dynamicky -->
+    <main id="library-page">
+        <div id="prompt-container">
+            <!-- Karty promptů budou vloženy dynamicky -->
+        </div>
+    </main>
+    <!-- Customní prompty: builder pro skládání XML promptu -->
+    <main id="custom-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Customní prompt</h2>
+            <p>Poskládej si prompt z částí, které můžeš přidávat a upravovat.</p>
+        </section>
+        <!-- Ovládací lišta pro přidání sekcí -->
+        <section class="builder-toolbar">
+            <button class="section-add-button" data-section="role">Role</button>
+            <button class="section-add-button" data-section="action">Úloha</button>
+            <button class="section-add-button" data-section="context">Kontext</button>
+            <button class="section-add-button" data-section="format">Formát</button>
+            <button class="section-add-button" data-section="restrictions">Omezení</button>
+            <button class="section-add-button" data-section="sources">Zdroje</button>
+            <button class="section-add-button" data-section="questions">Otázky</button>
+            <button class="section-add-button" data-section="examples">Příklady</button>
+        </section>
+        <section class="builder-grid" id="builder-sections">
+            <div class="prompt-card builder-card" data-section="role" data-active="true">
+                <div class="builder-card-header">
+                    <h2>Role</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Kdo jsi a v jake roli vystupujes?"></textarea>
+            </div>
+            <div class="prompt-card builder-card" data-section="action" data-active="true">
+                <div class="builder-card-header">
+                    <h2>Action</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Co presne mas udelat?"></textarea>
+            </div>
+            <div class="prompt-card builder-card" data-section="context" data-active="true">
+                <div class="builder-card-header">
+                    <h2>Context</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Jake pozadi, data nebo situace jsou dulezite?"></textarea>
+            </div>
+            <div class="prompt-card builder-card" data-section="format" data-active="true">
+                <div class="builder-card-header">
+                    <h2>Format</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Jak ma vypadat vysledek?"></textarea>
+            </div>
+            <div class="prompt-card builder-card hidden" data-section="restrictions" data-active="false">
+                <div class="builder-card-header">
+                    <h2>Restrictions</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Co se nema delat nebo na co si dat pozor?"></textarea>
+            </div>
+            <div class="prompt-card builder-card hidden" data-section="sources" data-active="false">
+                <div class="builder-card-header">
+                    <h2>Sources</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Z jakych zdroju mas cerpat?"></textarea>
+            </div>
+            <div class="prompt-card builder-card hidden" data-section="questions" data-active="false">
+                <div class="builder-card-header">
+                    <h2>Questions</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4">pokud něco potřebuješ upřesnit, tak se mě zeptej</textarea>
+            </div>
+            <div class="prompt-card builder-card hidden" data-section="examples" data-active="false">
+                <div class="builder-card-header">
+                    <h2>Examples</h2>
+                    <button class="remove-section">Skrýt</button>
+                </div>
+                <textarea rows="4" placeholder="Priklad vstupu a vystupu."></textarea>
+            </div>
+        </section>
+        <!-- Výstupní pole se složeným XML -->
+        <section class="builder-output">
+            <div class="prompt-card">
+                <div class="builder-card-header">
+                    <h2>Výstup</h2>
+                    <button id="copy-xml">Kopírovat výstup</button>
+                </div>
+                <textarea id="xml-output" rows="10" readonly></textarea>
+            </div>
+        </section>
     </main>
     <!-- Patička s metadaty projektu -->
     <footer>
-        <p>Verze: 0.04</p>
-        <p>Poslední commit: 06.02.2025 </p>
+        <p>Verze: 0.06</p>
+        <p>Poslední commit: 23.02.2025 </p>
         <p>Kontakt: nilyassov@koop.cz </p>
     </footer>
     <!-- Načtení aplikační logiky -->
