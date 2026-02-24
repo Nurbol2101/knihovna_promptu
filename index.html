@@ -12,6 +12,7 @@
     <section class="page-header">
         <div class="page-toggle">
             <button class="page-button active" data-page="library">Knihovna promptů</button>
+            <button class="page-button" data-page="new-prompt">Přidat prompt do knihovny</button>
             <button class="page-button" data-page="custom">Customní prompt</button>
         </div>
     </section>
@@ -34,6 +35,33 @@
             <!-- Karty promptů budou vloženy dynamicky -->
         </div>
     </main>
+    <!-- Nová stránka: formulář pro přidání nového promptu do knihovny -->
+    <main id="new-prompt-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Nový prompt do knihovny</h2>
+            <p>Vytvořte vlastní prompt a přidejte ho do své knihovny. Prompt bude uložen lokálně ve vašem prohlížeči.</p>
+        </section>
+        <section class="new-prompt-form">
+            <div class="prompt-card">
+                <div class="form-group">
+                    <label for="new-prompt-category">Kategorie</label>
+                    <input type="text" id="new-prompt-category" placeholder="např. #moje_kategorie" required>
+                    <small>Začněte hashtagem (#)</small>
+                </div>
+                <div class="form-group">
+                    <label for="new-prompt-title">Název promptu</label>
+                    <input type="text" id="new-prompt-title" placeholder="např. Analýza dat" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-prompt-content">Obsah promptu</label>
+                    <textarea id="new-prompt-content" rows="8" placeholder="Sem napište celý text promptu..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button id="save-prompt" class="primary-button">Uložit do knihovny</button>
+                </div>
+            </div>
+        </section>
+    </main>
     <!-- Customní prompty: builder pro skládání XML promptu -->
     <main id="custom-page" class="hidden">
         <section class="builder-intro">
@@ -41,15 +69,21 @@
             <p>Poskládej si prompt z částí, které můžeš přidávat a upravovat.</p>
         </section>
         <!-- Ovládací lišta pro přidání sekcí -->
-        <section class="builder-toolbar">
-            <button class="section-add-button" data-section="role">Role</button>
-            <button class="section-add-button" data-section="action">Úloha</button>
-            <button class="section-add-button" data-section="context">Kontext</button>
-            <button class="section-add-button" data-section="format">Formát</button>
-            <button class="section-add-button" data-section="restrictions">Omezení</button>
-            <button class="section-add-button" data-section="sources">Zdroje</button>
-            <button class="section-add-button" data-section="questions">Otázky</button>
-            <button class="section-add-button" data-section="examples">Příklady</button>
+        <section class="builder-toolbar" id="builder-toolbar">
+            <div class="toolbar-group">
+                <h3>Základní</h3>
+                <button class="section-add-button" data-section="role">Role</button>
+                <button class="section-add-button" data-section="action">Úloha</button>
+                <button class="section-add-button" data-section="context">Kontext</button>
+                <button class="section-add-button" data-section="format">Formát</button>
+            </div>
+            <div class="toolbar-group">
+                <h3>Volitelné</h3>
+                <button class="section-add-button" data-section="restrictions">Omezení</button>
+                <button class="section-add-button" data-section="sources">Zdroje</button>
+                <button class="section-add-button" data-section="questions">Otázky</button>
+                <button class="section-add-button" data-section="examples">Příklady</button>
+            </div>
         </section>
         <section class="builder-grid" id="builder-sections">
             <div class="prompt-card builder-card" data-section="role" data-active="true">
@@ -57,56 +91,56 @@
                     <h2>Role</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Kdo jsi a v jake roli vystupujes?"></textarea>
+                <textarea rows="4" placeholder="V jaké roli má být AI model?"></textarea>
             </div>
             <div class="prompt-card builder-card" data-section="action" data-active="true">
                 <div class="builder-card-header">
-                    <h2>Action</h2>
+                    <h2>Úloha</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Co presne mas udelat?"></textarea>
+                <textarea rows="4" placeholder="Co to přesně má udělat?"></textarea>
             </div>
             <div class="prompt-card builder-card" data-section="context" data-active="true">
                 <div class="builder-card-header">
-                    <h2>Context</h2>
+                    <h2>Kontext </h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Jake pozadi, data nebo situace jsou dulezite?"></textarea>
+                <textarea rows="4" placeholder="V jakém kontextu to má pracovat?"></textarea>
             </div>
             <div class="prompt-card builder-card" data-section="format" data-active="true">
                 <div class="builder-card-header">
-                    <h2>Format</h2>
+                    <h2>Formát</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Jak ma vypadat vysledek?"></textarea>
+                <textarea rows="4" placeholder="Jak má vypadat výsledek?"></textarea>
             </div>
             <div class="prompt-card builder-card hidden" data-section="restrictions" data-active="false">
                 <div class="builder-card-header">
-                    <h2>Restrictions</h2>
+                    <h2>Omezení</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Co se nema delat nebo na co si dat pozor?"></textarea>
+                <textarea rows="4" placeholder="Co AI model dělat nemá?"></textarea>
             </div>
             <div class="prompt-card builder-card hidden" data-section="sources" data-active="false">
                 <div class="builder-card-header">
-                    <h2>Sources</h2>
+                    <h2>Zdroje</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Z jakych zdroju mas cerpat?"></textarea>
+                <textarea rows="4" placeholder="Z jakých zdrodjů má AI model čerpat data?"></textarea>
             </div>
             <div class="prompt-card builder-card hidden" data-section="questions" data-active="false">
                 <div class="builder-card-header">
-                    <h2>Questions</h2>
+                    <h2>Otázky</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
                 <textarea rows="4">pokud něco potřebuješ upřesnit, tak se mě zeptej</textarea>
             </div>
             <div class="prompt-card builder-card hidden" data-section="examples" data-active="false">
                 <div class="builder-card-header">
-                    <h2>Examples</h2>
+                    <h2>Příklady</h2>
                     <button class="remove-section">Skrýt</button>
                 </div>
-                <textarea rows="4" placeholder="Priklad vstupu a vystupu."></textarea>
+                <textarea rows="4" placeholder="Příklad vstupu a/nebo výstupu."></textarea>
             </div>
         </section>
         <!-- Výstupní pole se složeným XML -->

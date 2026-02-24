@@ -55,23 +55,72 @@ const categoryList = document.getElementById('category-list');
 const pageButtons = document.querySelectorAll('.page-button');
 const libraryPage = document.getElementById('library-page');
 const customPage = document.getElementById('custom-page');
+const newPromptPage = document.getElementById('new-prompt-page');
 const libraryControls = document.querySelector('.library-controls');
+const navElement = document.querySelector('nav');
 const builderCards = document.querySelectorAll('.builder-card');
 const addButtons = document.querySelectorAll('.section-add-button');
 const xmlOutput = document.getElementById('xml-output');
 const copyXmlButton = document.getElementById('copy-xml');
+const builderToolbar = document.getElementById('builder-toolbar');
+const builderSections = document.getElementById('builder-sections');
+
+// Reference pro novou stránku
+const newPromptCategory = document.getElementById('new-prompt-category');
+const newPromptTitle = document.getElementById('new-prompt-title');
+const newPromptContent = document.getElementById('new-prompt-content');
+const savePromptButton = document.getElementById('save-prompt');
+
+// localStorage klíč pro ukládání promptů
+const STORAGE_KEY = 'customPrompts';
+
+// Načte vlastní prompty z localStorage
+function loadCustomPrompts() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error('Chyba při načítání promptů:', error);
+        return [];
+    }
+}
+
+// Uloží vlastní prompty do localStorage
+function saveCustomPrompts(customPrompts) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(customPrompts));
+        return true;
+    } catch (error) {
+        console.error('Chyba při ukládání promptů:', error);
+        return false;
+    }
+}
+
+// Spojí vestavěné a vlastní prompty
+function getAllPrompts() {
+    const customPrompts = loadCustomPrompts();
+    return [...customPrompts, ...prompts];
+}
 
 // Vykreslí karty promptů podle zadaného filtru
 function displayPrompts(filteredPrompts) {
     promptContainer.innerHTML = '';
-    filteredPrompts.forEach(prompt => {
+    filteredPrompts.forEach((prompt, index) => {
         const card = document.createElement('div');
         card.className = 'prompt-card';
+        
+        // Kontrola, jestli je to vlastní prompt (má id)
+        const isCustom = prompt.id !== undefined;
+        const deleteButton = isCustom ? `<button class="delete-button" data-id="${prompt.id}">Smazat</button>` : '';
+        
         card.innerHTML = `
             <h2>${prompt.title}</h2>
             <div class="hashtag">${prompt.category}</div>
             <p>${prompt.content}</p>
-            <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat!</button>
+            <div class="card-actions">
+                <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat!</button>
+                ${deleteButton}
+            </div>
         `;
         promptContainer.appendChild(card);
     });
@@ -83,15 +132,24 @@ function displayPrompts(filteredPrompts) {
             copyToClipboard(content);
         });
     });
+    
+    // Přidání event listenerů na tlačítka Smazat
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const promptId = this.getAttribute('data-id');
+            deleteCustomPrompt(promptId);
+        });
+    });
 }
 
 // Po načtení stránky zobrazí všechny prompty
-displayPrompts(prompts);
+displayPrompts(getAllPrompts());
 
 // Dynamicky generuje kategorie ze souboru prompts
 function generateCategories() {
     // Získat všechny jedinečné kategorie
-    const categories = [...new Set(prompts.map(prompt => prompt.category))].sort();
+    const allPrompts = getAllPrompts();
+    const categories = [...new Set(allPrompts.map(prompt => prompt.category))].sort();
     
     // Vyčistit stávající kategorie (kromě "Všechny kategorie")
     const categoryList = document.getElementById('category-list');
@@ -121,7 +179,8 @@ function normalizeString(str) {
 // Vyhledávání v reálném čase podle názvu, kategorie i obsahu
 searchInput.addEventListener('input', () => {
     const searchTerm = normalizeString(searchInput.value);
-    const filteredPrompts = prompts.filter(prompt => 
+    const allPrompts = getAllPrompts();
+    const filteredPrompts = allPrompts.filter(prompt => 
         normalizeString(prompt.title).includes(searchTerm) || 
         normalizeString(prompt.category).includes(searchTerm) || 
         normalizeString(prompt.content).includes(searchTerm)
@@ -135,7 +194,8 @@ searchInput.addEventListener('input', () => {
 categoryList.addEventListener('click', (event) => {
     const selectedCategory = event.target.dataset.category;
     if (selectedCategory) {
-        const filteredPrompts = selectedCategory === 'all' ? prompts : prompts.filter(prompt => prompt.category === selectedCategory);
+        const allPrompts = getAllPrompts();
+        const filteredPrompts = selectedCategory === 'all' ? allPrompts : allPrompts.filter(prompt => prompt.category === selectedCategory);
         displayPrompts(filteredPrompts);
         categoryList.classList.add('hidden');
         // Aktualizace textu tlačítka, aby ukazoval vybranou kategorii
@@ -233,17 +293,47 @@ function setAddButtonState(section, isActive) {
     button.disabled = isActive;
 }
 
-// Přepne mezi stránkami Knihovna a Customní prompt
+// Obsluha skrytí/zobrazení a disable všech sekcí po kliknutí na toolbar
+function toggleBuilderCards(shouldHide) {
+    if (builderSections) {
+        let willBeHidden;
+        if (shouldHide !== undefined) {
+            willBeHidden = shouldHide;
+            builderSections.classList.toggle('hidden', shouldHide);
+        } else {
+            willBeHidden = !builderSections.classList.contains('hidden');
+            builderSections.classList.toggle('hidden');
+        }
+        // Disable/enable všechny textarea a tlačítka v sekcích
+        const textareas = builderSections.querySelectorAll('textarea');
+        const buttons = builderSections.querySelectorAll('.remove-section');
+        
+        textareas.forEach(textarea => {
+            textarea.disabled = willBeHidden;
+        });
+        buttons.forEach(button => {
+            button.disabled = willBeHidden;
+        });
+    }
+}
+
+// Přepne mezi stránkami Knihovna, Customní prompt a Nový prompt
 function setPage(page) {
     const isLibrary = page === 'library';
+    const isCustom = page === 'custom';
+    const isNewPrompt = page === 'new-prompt';
+    
     if (libraryPage) {
         libraryPage.classList.toggle('hidden', !isLibrary);
     }
     if (customPage) {
-        customPage.classList.toggle('hidden', isLibrary);
+        customPage.classList.toggle('hidden', !isCustom);
     }
-    if (libraryControls) {
-        libraryControls.classList.toggle('hidden', !isLibrary);
+    if (newPromptPage) {
+        newPromptPage.classList.toggle('hidden', !isNewPrompt);
+    }
+    if (navElement) {
+        navElement.classList.toggle('hidden', !isLibrary);
     }
     pageButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.page === page);
@@ -282,7 +372,7 @@ builderCards.forEach(card => {
     setAddButtonState(section, isActive);
 });
 
-// Obsluha znovu-zobrazení skrytých sekcí
+// Obsluha togglování sekcí - skrytí/zobrazení po kliknutí na tlačítko
 addButtons.forEach(button => {
     button.addEventListener('click', () => {
         if (button.disabled) {
@@ -293,12 +383,23 @@ addButtons.forEach(button => {
         if (!card) {
             return;
         }
-        card.dataset.active = 'true';
-        card.classList.remove('hidden');
-        setAddButtonState(section, true);
-        const textarea = card.querySelector('textarea');
-        if (textarea) {
-            textarea.focus();
+        
+        // Toggle visibility
+        const isCurrentlyHidden = card.classList.contains('hidden');
+        if (isCurrentlyHidden) {
+            // Show the section
+            card.dataset.active = 'true';
+            card.classList.remove('hidden');
+            setAddButtonState(section, true);
+            const textarea = card.querySelector('textarea');
+            if (textarea) {
+                textarea.focus();
+            }
+        } else {
+            // Hide the section
+            card.dataset.active = 'false';
+            card.classList.add('hidden');
+            setAddButtonState(section, false);
         }
         updateXmlOutput();
     });
@@ -310,6 +411,92 @@ if (copyXmlButton) {
         copyToClipboard(xmlOutput.value);
     });
 }
+
+// Obsluha skrytí/zobrazení sekcí po kliknutí na toolbar
+if (builderToolbar) {
+    builderToolbar.addEventListener('click', (event) => {
+        // Neaplikuj toggle, pokud byl kliknut na tlačítko sekce nebo jej obsah
+        const clickedButton = event.target.closest('.section-add-button');
+        if (clickedButton) {
+            return;
+        }
+        toggleBuilderCards();
+    });
+}
+
+// === FUNKCE PRO NOVOU STRÁNKU (Nový prompt do knihovny) ===
+
+// Vyčistí formulář
+function clearForm() {
+    if (newPromptCategory) newPromptCategory.value = '';
+    if (newPromptTitle) newPromptTitle.value = '';
+    if (newPromptContent) newPromptContent.value = '';
+}
+
+// Uloží nový prompt
+function saveNewPrompt() {
+    if (!newPromptCategory || !newPromptTitle || !newPromptContent) return;
+    
+    const category = newPromptCategory.value.trim();
+    const title = newPromptTitle.value.trim();
+    const content = newPromptContent.value.trim();
+    
+    // Validace
+    if (!category || !title || !content) {
+        showToast('⚠ Vyplňte všechna pole!');
+        return;
+    }
+    
+    // Ujisti se, že kategorie začíná #
+    const formattedCategory = category.startsWith('#') ? category : '#' + category;
+    
+    // Načti stávající prompty
+    const customPrompts = loadCustomPrompts();
+    
+    // Vytvoř nový prompt s jedinečným ID
+    const newPrompt = {
+        id: Date.now().toString(),
+        category: formattedCategory,
+        title: title,
+        content: content
+    };
+    
+    // Přidej na začátek pole (nejnovější první)
+    customPrompts.unshift(newPrompt);
+    
+    // Ulož
+    if (saveCustomPrompts(customPrompts)) {
+        showToast('✓ Prompt úspěšně uložen!');
+        clearForm();
+        generateCategories();
+        // Přepni na knihovnu a zobraz všechny prompty včetně nově přidaného
+        displayPrompts(getAllPrompts());
+        setPage('library');
+    } else {
+        showToast('✗ Chyba při ukládání promptu');
+    }
+}
+
+// Smaže vlastní prompt
+function deleteCustomPrompt(promptId) {
+    const customPrompts = loadCustomPrompts();
+    const filtered = customPrompts.filter(p => p.id !== promptId);
+    
+    if (saveCustomPrompts(filtered)) {
+        showToast('✓ Prompt smazán');
+        displayPrompts(getAllPrompts());
+        generateCategories();
+    } else {
+        showToast('✗ Chyba při mazání promptu');
+    }
+}
+
+// Event listenery pro novou stránku
+if (savePromptButton) {
+    savePromptButton.addEventListener('click', saveNewPrompt);
+}
+
+// === KONEC FUNKCÍ PRO NOVOU STRÁNKU ===
 
 setPage('library');
 updateXmlOutput();
