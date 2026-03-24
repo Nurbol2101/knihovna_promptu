@@ -47,6 +47,11 @@ const prompts = [
     }
 ];
 
+// Přidá interní klíče vestavěným promptům pro editaci
+prompts.forEach((prompt, index) => {
+    prompt.builtinId = `builtin-${index}`;
+});
+
 // Reference na klíčové prvky v DOMu
 const promptContainer = document.getElementById('prompt-container');
 const searchInput = document.getElementById('search-input');
@@ -70,9 +75,16 @@ const newPromptCategory = document.getElementById('new-prompt-category');
 const newPromptTitle = document.getElementById('new-prompt-title');
 const newPromptContent = document.getElementById('new-prompt-content');
 const savePromptButton = document.getElementById('save-prompt');
+const editPromptModal = document.getElementById('edit-prompt-modal');
+const editPromptCategory = document.getElementById('edit-prompt-category');
+const editPromptTitleInput = document.getElementById('edit-prompt-title-input');
+const editPromptContent = document.getElementById('edit-prompt-content');
+const saveEditedPromptButton = document.getElementById('save-edited-prompt');
+const closeEditPromptButton = document.getElementById('close-edit-prompt');
 
 // localStorage klíč pro ukládání promptů
 const STORAGE_KEY = 'customPrompts';
+let currentEditTarget = null;
 
 // Načte vlastní prompty z localStorage
 function loadCustomPrompts() {
@@ -111,13 +123,16 @@ function displayPrompts(filteredPrompts) {
         
         // Kontrola, jestli je to vlastní prompt (má id)
         const isCustom = prompt.id !== undefined;
-        const deleteButton = isCustom ? `<button class="delete-button" data-id="${prompt.id}">Smazat</button>` : '';
+        const promptKey = isCustom ? prompt.id : prompt.builtinId;
+        const deleteButton = `<button class="delete-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}">Smazat</button>`;
+        const editButton = `<button class="edit-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}">Editovat</button>`;
         
         card.innerHTML = `
             <h2>${prompt.title}</h2>
             <div class="hashtag">${prompt.category}</div>
             <p>${prompt.content}</p>
             <div class="card-actions">
+                ${editButton}
                 <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat!</button>
                 ${deleteButton}
             </div>
@@ -136,8 +151,18 @@ function displayPrompts(filteredPrompts) {
     // Přidání event listenerů na tlačítka Smazat
     document.querySelectorAll('.delete-button').forEach(button => {
         button.addEventListener('click', function() {
-            const promptId = this.getAttribute('data-id');
-            deleteCustomPrompt(promptId);
+            const source = this.getAttribute('data-source');
+            const key = this.getAttribute('data-key');
+            deletePrompt(source, key);
+        });
+    });
+
+    // Přidání event listenerů na tlačítka Editovat
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const source = this.getAttribute('data-source');
+            const key = this.getAttribute('data-key');
+            openEditPromptDialog(source, key);
         });
     });
 }
@@ -259,8 +284,7 @@ function escapeXml(text) {
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&apos;');
+        .replace(/"/g, '&quot;');
 }
 
 // Vytvoří XML výstup podle aktivních sekcí
@@ -433,6 +457,95 @@ function clearForm() {
     if (newPromptContent) newPromptContent.value = '';
 }
 
+function getPromptByTarget(source, key) {
+    if (source === 'custom') {
+        const customPrompts = loadCustomPrompts();
+        return customPrompts.find(prompt => prompt.id === key) || null;
+    }
+    return prompts.find(prompt => prompt.builtinId === key) || null;
+}
+
+function openEditPromptDialog(source, key) {
+    if (!editPromptModal || !editPromptCategory || !editPromptTitleInput || !editPromptContent) {
+        return;
+    }
+    const prompt = getPromptByTarget(source, key);
+    if (!prompt) {
+        showToast('Prompt nebyl nalezen');
+        return;
+    }
+
+    currentEditTarget = { source, key };
+    editPromptCategory.value = prompt.category || '';
+    editPromptTitleInput.value = prompt.title || '';
+    editPromptContent.value = prompt.content || '';
+    editPromptModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    editPromptTitleInput.focus();
+}
+
+function closeEditPromptDialog() {
+    if (!editPromptModal) {
+        return;
+    }
+    editPromptModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    currentEditTarget = null;
+}
+
+function saveEditedPrompt() {
+    if (!currentEditTarget || !editPromptCategory || !editPromptTitleInput || !editPromptContent) {
+        return;
+    }
+
+    const categoryRaw = editPromptCategory.value.trim();
+    const title = editPromptTitleInput.value.trim();
+    const content = editPromptContent.value.trim();
+
+    if (!categoryRaw || !title || !content) {
+        showToast('⚠ Vyplň všechny pole!');
+        return;
+    }
+
+    const category = categoryRaw.startsWith('#') ? categoryRaw : `#${categoryRaw}`;
+
+    if (currentEditTarget.source === 'custom') {
+        const customPrompts = loadCustomPrompts();
+        const targetIndex = customPrompts.findIndex(prompt => prompt.id === currentEditTarget.key);
+
+        if (targetIndex === -1) {
+            showToast('Prompt nebyl nalezen');
+            return;
+        }
+
+        customPrompts[targetIndex] = {
+            ...customPrompts[targetIndex],
+            category,
+            title,
+            content
+        };
+
+        if (!saveCustomPrompts(customPrompts)) {
+            showToast('✗ Chyba při ukládání promptu');
+            return;
+        }
+    } else {
+        const builtinPrompt = prompts.find(prompt => prompt.builtinId === currentEditTarget.key);
+        if (!builtinPrompt) {
+            showToast('Prompt nebyl nalezen');
+            return;
+        }
+        builtinPrompt.category = category;
+        builtinPrompt.title = title;
+        builtinPrompt.content = content;
+    }
+
+    closeEditPromptDialog();
+    generateCategories();
+    displayPrompts(getAllPrompts());
+    showToast('✓ Prompt byl upraven');
+}
+
 // Uloží nový prompt
 function saveNewPrompt() {
     if (!newPromptCategory || !newPromptTitle || !newPromptContent) return;
@@ -443,7 +556,7 @@ function saveNewPrompt() {
     
     // Validace
     if (!category || !title || !content) {
-        showToast('⚠ Vyplňte všechna pole!');
+        showToast('⚠ Vyplň všechny pole!');
         return;
     }
     
@@ -477,23 +590,49 @@ function saveNewPrompt() {
     }
 }
 
-// Smaže vlastní prompt
-function deleteCustomPrompt(promptId) {
-    const customPrompts = loadCustomPrompts();
-    const filtered = customPrompts.filter(p => p.id !== promptId);
-    
-    if (saveCustomPrompts(filtered)) {
-        showToast('✓ Prompt smazán');
-        displayPrompts(getAllPrompts());
-        generateCategories();
+// Smaže prompt (vlastní i vestavěný)
+function deletePrompt(source, key) {
+    if (source === 'custom') {
+        const customPrompts = loadCustomPrompts();
+        const filtered = customPrompts.filter(prompt => prompt.id !== key);
+
+        if (!saveCustomPrompts(filtered)) {
+            showToast('✗ Chyba při mazání promptu');
+            return;
+        }
     } else {
-        showToast('✗ Chyba při mazání promptu');
+        const targetIndex = prompts.findIndex(prompt => prompt.builtinId === key);
+        if (targetIndex === -1) {
+            showToast('Prompt nebyl nalezen');
+            return;
+        }
+        prompts.splice(targetIndex, 1);
     }
+
+    showToast('✓ Prompt smazán');
+    displayPrompts(getAllPrompts());
+    generateCategories();
 }
 
 // Event listenery pro novou stránku
 if (savePromptButton) {
     savePromptButton.addEventListener('click', saveNewPrompt);
+}
+
+if (saveEditedPromptButton) {
+    saveEditedPromptButton.addEventListener('click', saveEditedPrompt);
+}
+
+if (closeEditPromptButton) {
+    closeEditPromptButton.addEventListener('click', closeEditPromptDialog);
+}
+
+if (editPromptModal) {
+    editPromptModal.addEventListener('click', (event) => {
+        if (event.target === editPromptModal) {
+            closeEditPromptDialog();
+        }
+    });
 }
 
 // === KONEC FUNKCÍ PRO NOVOU STRÁNKU ===

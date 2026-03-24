@@ -273,14 +273,16 @@ nav {
 
 .builder-card {
     text-align: left;
+    position: relative;
 }
 
 .builder-card-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 10px;
     margin-bottom: 10px;
+    padding-right: 90px;
 }
 
 .builder-card textarea {
@@ -306,6 +308,13 @@ nav {
     font-size: 13px;
     cursor: pointer;
     transition: all 0.01s ease;
+}
+
+.builder-card .remove-section {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    bottom: auto;
 }
 
 .remove-section:hover,
@@ -355,15 +364,15 @@ nav {
 
 .prompt-card {
     /* Vzhled jednotlivé karty promptu - iOS Liquid Glass style */
-    background: rgba(45, 38, 35, 0.4);
+    background: rgba(204, 137, 240, 0.061);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1.5px solid rgba(242, 234, 223, 0.2);
     border-radius: 20px;
-    padding: 20px;
+    padding: 60px 20px 20px;
     position: relative;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(53, 20, 20, 0.836), inset 0 1px 2px rgba(255, 255, 255, 0.1);
     transition: all 0.15s ease;
     font-size: 16px;
 }
@@ -402,7 +411,7 @@ nav {
 .prompt-card button {
     /* Tlačítko pro kopírování - Glass style */
     position: absolute;
-    bottom: 15px;
+    top: 15px;
     right: 15px;
     background: rgba(114, 125, 55, 0.733);
     backdrop-filter: blur(10px);
@@ -415,6 +424,16 @@ nav {
     padding: 8px 16px;
     font-weight: 500;
     transition: all 0.01s ease;
+}
+
+.edit-button {
+    background: rgba(45, 134, 89, 0.75) !important;
+    border: 1px solid rgba(45, 134, 89, 0.9) !important;
+}
+
+.edit-button:hover {
+    background: rgba(45, 134, 89, 0.95) !important;
+    border-color: rgba(120, 255, 188, 0.9) !important;
 }
 
 .prompt-card button:hover {
@@ -515,7 +534,7 @@ footer p {
 .form-group input,
 .form-group textarea {
     width: 100%;
-    background-color: #1f1814;
+    background-color: #14141f;
     color: #ffffff;
     border: 1.5px solid rgba(242, 234, 223, 0.35);
     border-radius: 10px;
@@ -546,6 +565,11 @@ footer p {
     justify-content: center;
 }
 
+.new-prompt-form .form-actions .primary-button {
+    position: static;
+    font-size: 20px;
+}
+
 .primary-button {
     background: rgba(45, 134, 89, 0.7);
     backdrop-filter: blur(10px);
@@ -555,7 +579,7 @@ footer p {
     border-radius: 25px;
     padding: 14px 32px;
     font-family: 'Calibri', sans-serif;
-    font-size: 18px;
+    font-size: 35px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -620,14 +644,78 @@ footer p {
 
 .card-actions {
     display: flex;
-    gap: 10px;
+    gap: 3px;
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    top: 15px;
+    right: 6px;
+    max-width: calc(100% - 30px);
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .card-actions button {
     position: static !important;
+    font-size: 12px !important;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    background: rgba(10, 8, 8, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.dialog-backdrop.hidden {
+    display: none;
+}
+
+.dialog-panel {
+    width: min(900px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+    text-align: left;
+    position: relative;
+    padding: 88px 28px 28px;
+}
+
+.dialog-panel h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 30px;
+}
+
+.dialog-panel .form-group input,
+.dialog-panel .form-group textarea {
+    width: 100%;
+}
+
+.dialog-panel .form-actions {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    margin-top: 0;
+    justify-content: flex-end;
+    gap: 14px;
+    flex-wrap: nowrap;
+}
+
+.dialog-panel .form-actions .primary-button,
+.dialog-panel .form-actions .secondary-button {
+    flex: 0 0 auto;
+    min-width: 140px;
+    font-size: 18px;
+    padding: 10px 22px;
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
 }
 
 /* === KONEC STYLŮ PRO NOVOU STRÁNKU === */

@@ -20,7 +20,7 @@
     <nav>
         <div class="library-controls">
             <div class="category-dropdown">
-                <button id="category-button">Vyberte kategorii </button>
+                <button id="category-button">Vyber kategorii </button>
                 <ul id="category-list" class="hidden">
                     <li data-category="all">Všechny kategorie</li>
                 </ul>
@@ -39,14 +39,14 @@
     <main id="new-prompt-page" class="hidden">
         <section class="builder-intro">
             <h2>Nový prompt do knihovny</h2>
-            <p>Vytvořte vlastní prompt a přidejte ho do své knihovny. Prompt bude uložen lokálně ve vašem prohlížeči.</p>
+            <p>Vytvoř vlastní prompt a přidej ho do své knihovny. Prompt bude uložen lokálně ve tvém prohlížeči.</p>
         </section>
         <section class="new-prompt-form">
             <div class="prompt-card">
                 <div class="form-group">
                     <label for="new-prompt-category">Kategorie</label>
                     <input type="text" id="new-prompt-category" placeholder="např. #moje_kategorie" required>
-                    <small>Začněte hashtagem (#)</small>
+                    <small>Začni hashtagem (#)</small>
                 </div>
                 <div class="form-group">
                     <label for="new-prompt-title">Název promptu</label>
@@ -54,7 +54,7 @@
                 </div>
                 <div class="form-group">
                     <label for="new-prompt-content">Obsah promptu</label>
-                    <textarea id="new-prompt-content" rows="8" placeholder="Sem napište celý text promptu..." required></textarea>
+                    <textarea id="new-prompt-content" rows="8" placeholder="Sem napiš celý text promptu..." required></textarea>
                 </div>
                 <div class="form-actions">
                     <button id="save-prompt" class="primary-button">Uložit do knihovny</button>
@@ -154,10 +154,31 @@
             </div>
         </section>
     </main>
+    <div id="edit-prompt-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="edit-prompt-title">
+        <section class="dialog-panel prompt-card">
+            <h2 id="edit-prompt-title">Editovat prompt</h2>
+            <div class="form-group">
+                <label for="edit-prompt-category">Kategorie (tag)</label>
+                <input type="text" id="edit-prompt-category" placeholder="napr. #moje_kategorie" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-prompt-title-input">Nazev</label>
+                <input type="text" id="edit-prompt-title-input" placeholder="Nazev promptu" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-prompt-content">Text promptu</label>
+                <textarea id="edit-prompt-content" rows="10" placeholder="Obsah promptu" required></textarea>
+            </div>
+            <div class="form-actions">
+                <button id="save-edited-prompt" class="primary-button">Ulozit</button>
+                <button id="close-edit-prompt" class="secondary-button">Zpet</button>
+            </div>
+        </section>
+    </div>
     <!-- Patička s metadaty projektu -->
     <footer>
-        <p>Verze: 0.07</p>
-        <p>Poslední commit: 24.02.2025 </p>
+        <p>Verze: 0.08</p>
+        <p>Poslední commit: 24.03.2025 </p>
         <p>Kontakt: nilyassov@koop.cz </p>
     </footer>
     <!-- Načtení aplikační logiky -->
