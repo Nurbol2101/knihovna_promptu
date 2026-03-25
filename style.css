@@ -278,11 +278,10 @@ nav {
 
 .builder-card-header {
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: space-between;
     gap: 10px;
     margin-bottom: 10px;
-    padding-right: 90px;
 }
 
 .builder-card textarea {
@@ -304,17 +303,15 @@ nav {
     border: 1px solid rgba(83, 94, 28, 0.6);
     color: #ffffff;
     border-radius: 20px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.01s ease;
 }
 
 .builder-card .remove-section {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    bottom: auto;
+    position: static;
+    margin-left: auto;
 }
 
 .remove-section:hover,
@@ -364,25 +361,36 @@ nav {
 
 .prompt-card {
     /* Vzhled jednotlivé karty promptu - iOS Liquid Glass style */
-    background: rgba(204, 137, 240, 0.061);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1.5px solid rgba(242, 234, 223, 0.2);
+    background: rgba(31, 24, 20, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(242, 234, 223, 0.35);
     border-radius: 20px;
-    padding: 60px 20px 20px;
+    padding: 30px 20px 20px;
     position: relative;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(53, 20, 20, 0.836), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1);
     transition: all 0.15s ease;
     font-size: 16px;
+    cursor: pointer;
+}
+
+/* Samostatné odsazení karet podle sekce */
+#library-page .prompt-card {
+    padding: 60px 20px 20px;
+}
+
+#custom-page .prompt-card {
+    padding: 20px;
 }
 
 .prompt-card:hover {
     /* Efekt při najetí myší pro moderní vzhled */
-    background: rgba(45, 38, 35, 0.5);
-    border-color: rgba(242, 234, 223, 0.3);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.15);
-    transform: translateY(-5px);
+    background: rgba(173, 173, 173, 0.071);
+    border-color: rgba(242, 234, 223, 0.55);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
 }
 
 .prompt-card h2 {
@@ -436,6 +444,26 @@ nav {
     border-color: rgba(120, 255, 188, 0.9) !important;
 }
 
+.copy-button,
+#save-edited-prompt {
+    background: rgba(83, 156, 56, 0.716) !important;
+    border: 1px solid rgba(45, 134, 89, 0.9) !important;
+}
+
+#close-edit-prompt {
+    border: 1px solid rgba(45, 134, 89, 0.9) !important;
+}
+
+.copy-button:hover,
+#save-edited-prompt:hover {
+    background: rgba(83, 156, 56, 0.883) !important;
+    border-color: rgba(120, 255, 188, 0.9) !important;
+}
+
+#close-edit-prompt:hover {
+    border-color: rgba(120, 255, 188, 0.9) !important;
+}
+
 .prompt-card button:hover {
     background: rgba(83, 94, 28, 0.6);
     border-color: rgba(83, 94, 28, 0.8);
@@ -450,7 +478,7 @@ footer {
     /* Patička stránky - iOS Liquid Glass style */
     text-align: center;
     padding: 15px;
-    background: rgba(45, 134, 89, 0.2);
+    background: rgba(45, 134, 89, 0.421);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 1.5px solid rgba(242, 234, 223, 0.15);
@@ -534,7 +562,7 @@ footer p {
 .form-group input,
 .form-group textarea {
     width: 100%;
-    background-color: #14141f;
+    background-color: rgba(12, 18, 11, 0.799);
     color: #ffffff;
     border: 1.5px solid rgba(242, 234, 223, 0.35);
     border-radius: 10px;
@@ -624,8 +652,8 @@ footer p {
 
 .delete-button,
 .delete-saved-button {
-    background: rgba(180, 50, 50, 0.7) !important;
-    border: 1px solid rgba(150, 40, 40, 0.6) !important;
+    background: rgba(148, 47, 54, 0.893) !important;
+    border: 1px solid rgba(45, 134, 89, 0.9) !important;
     color: #ffffff !important;
     border-radius: 20px !important;
     padding: 8px 16px !important;
@@ -637,8 +665,8 @@ footer p {
 
 .delete-button:hover,
 .delete-saved-button:hover {
-    background: rgba(150, 40, 40, 0.85) !important;
-    border-color: rgba(120, 30, 30, 0.8) !important;
+    background: rgb(148, 47, 54) !important;
+    border-color: rgba(120, 255, 188, 0.9) !important;
     transform: scale(1.05) !important;
 }
 
@@ -717,5 +745,112 @@ body.modal-open {
     top: auto !important;
     right: auto !important;
 }
+
+/* === STYLY PRO POTVRZOVACÍ DIALOG DELETE === */
+
+.delete-modal-panel {
+    width: min(420px, 100%);
+    padding: 40px 28px 28px;
+    text-align: center;
+    background: rgba(31, 24, 20, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delete-modal-panel h2 {
+    margin: 0 0 16px 0;
+    font-size: 26px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.delete-modal-panel p {
+    margin: 0 0 32px 0;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+}
+
+.delete-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    margin: 0 !important;
+    justify-content: center;
+}
+
+.danger-button {
+    background: linear-gradient(135deg, rgba(220, 60, 60, 0.8), rgba(180, 40, 40, 0.8));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255, 100, 100, 0.3);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 14px 28px;
+    font-family: 'Calibri', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    flex: 1;
+    min-height: 50px;
+    box-shadow: 0 8px 20px rgba(220, 60, 60, 0.25);
+}
+
+.danger-button:hover {
+    background: linear-gradient(135deg, rgba(240, 80, 80, 0.95), rgba(200, 50, 50, 0.95));
+    border-color: rgba(255, 120, 120, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(220, 60, 60, 0.35);
+}
+
+.danger-button:active {
+    transform: translateY(-1px);
+}
+
+.delete-actions .secondary-button {
+    background: rgba(60, 60, 60, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 14px 28px;
+    font-size: 18px;
+    min-height: 50px;
+    flex: 1;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.delete-actions .secondary-button:hover {
+    background: rgba(80, 80, 80, 0.8);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.delete-actions .secondary-button:active {
+    transform: translateY(-1px);
+}
+
+/* === KONEC STYLŮ PRO POTVRZOVACÍ DIALOG DELETE === */
 
 /* === KONEC STYLŮ PRO NOVOU STRÁNKU === */

@@ -154,6 +154,16 @@
             </div>
         </section>
     </main>
+    <div id="delete-prompt-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="delete-prompt-title">
+        <section class="dialog-panel delete-modal-panel">
+            <h2 id="delete-prompt-title">Smazat tento prompt?</h2>
+            <p>Jsi si jistý/jistá, že chceš smazat tento prompt? Smazaný prompt nebude možné vrátit zpět.</p>
+            <div class="form-actions delete-actions">
+                <button id="confirm-delete-prompt" class="danger-button">Smazat</button>
+                <button id="cancel-delete-prompt" class="secondary-button">Zrušit</button>
+            </div>
+        </section>
+    </div>
     <div id="edit-prompt-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="edit-prompt-title">
         <section class="dialog-panel prompt-card">
             <h2 id="edit-prompt-title">Editovat prompt</h2>
@@ -162,22 +172,22 @@
                 <input type="text" id="edit-prompt-category" placeholder="napr. #moje_kategorie" required>
             </div>
             <div class="form-group">
-                <label for="edit-prompt-title-input">Nazev</label>
-                <input type="text" id="edit-prompt-title-input" placeholder="Nazev promptu" required>
+                <label for="edit-prompt-title-input">Název</label>
+                <input type="text" id="edit-prompt-title-input" placeholder="Název promptu" required>
             </div>
             <div class="form-group">
                 <label for="edit-prompt-content">Text promptu</label>
                 <textarea id="edit-prompt-content" rows="10" placeholder="Obsah promptu" required></textarea>
             </div>
             <div class="form-actions">
-                <button id="save-edited-prompt" class="primary-button">Ulozit</button>
-                <button id="close-edit-prompt" class="secondary-button">Zpet</button>
+                <button id="save-edited-prompt" class="primary-button">Uložit</button>
+                <button id="close-edit-prompt" class="secondary-button">Zpět</button>
             </div>
         </section>
     </div>
     <!-- Patička s metadaty projektu -->
     <footer>
-        <p>Verze: 0.08</p>
+        <p>Verze: 0.08 (pro release 0.0.2)</p>
         <p>Poslední commit: 24.03.2025 </p>
         <p>Kontakt: nilyassov@koop.cz </p>
     </footer>

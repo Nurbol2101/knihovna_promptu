@@ -82,9 +82,15 @@ const editPromptContent = document.getElementById('edit-prompt-content');
 const saveEditedPromptButton = document.getElementById('save-edited-prompt');
 const closeEditPromptButton = document.getElementById('close-edit-prompt');
 
+// Reference pro delete modal
+const deletePromptModal = document.getElementById('delete-prompt-modal');
+const confirmDeletePromptButton = document.getElementById('confirm-delete-prompt');
+const cancelDeletePromptButton = document.getElementById('cancel-delete-prompt');
+
 // localStorage klíč pro ukládání promptů
 const STORAGE_KEY = 'customPrompts';
 let currentEditTarget = null;
+let pendingDelete = null;
 
 // Načte vlastní prompty z localStorage
 function loadCustomPrompts() {
@@ -153,7 +159,9 @@ function displayPrompts(filteredPrompts) {
         button.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             const key = this.getAttribute('data-key');
-            deletePrompt(source, key);
+            
+            // Zobrazit potvrzovací dialog
+            showDeleteConfirmDialog(source, key);
         });
     });
 
@@ -493,6 +501,34 @@ function closeEditPromptDialog() {
     currentEditTarget = null;
 }
 
+function showDeleteConfirmDialog(source, key) {
+    if (!deletePromptModal) {
+        return;
+    }
+    pendingDelete = { source, key };
+    deletePromptModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    confirmDeletePromptButton.focus();
+}
+
+function closeDeleteConfirmDialog() {
+    if (!deletePromptModal) {
+        return;
+    }
+    deletePromptModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    pendingDelete = null;
+}
+
+function confirmDeletePrompt() {
+    if (!pendingDelete) {
+        return;
+    }
+    const { source, key } = pendingDelete;
+    closeDeleteConfirmDialog();
+    deletePrompt(source, key);
+}
+
 function saveEditedPrompt() {
     if (!currentEditTarget || !editPromptCategory || !editPromptTitleInput || !editPromptContent) {
         return;
@@ -631,6 +667,22 @@ if (editPromptModal) {
     editPromptModal.addEventListener('click', (event) => {
         if (event.target === editPromptModal) {
             closeEditPromptDialog();
+        }
+    });
+}
+
+if (confirmDeletePromptButton) {
+    confirmDeletePromptButton.addEventListener('click', confirmDeletePrompt);
+}
+
+if (cancelDeletePromptButton) {
+    cancelDeletePromptButton.addEventListener('click', closeDeleteConfirmDialog);
+}
+
+if (deletePromptModal) {
+    deletePromptModal.addEventListener('click', (event) => {
+        if (event.target === deletePromptModal) {
+            closeDeleteConfirmDialog();
         }
     });
 }
