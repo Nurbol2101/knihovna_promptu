@@ -3,24 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.5">
-    <title>Knihovna promptů</title>
+    <title>AI Laboratoř</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Přepínač stránky: přepíná Knihovna vs. Customní prompt -->
-    <section class="page-header">
-        <div class="page-toggle">
-            <button class="page-button active" data-page="library">Knihovna promptů</button>
-            <button class="page-button" data-page="new-prompt">Přidat prompt do knihovny</button>
-            <button class="page-button" data-page="custom">Customní prompt</button>
-        </div>
-    </section>
+    <div class="app-layout">
+        <aside class="sidebar-tree" aria-label="Navigace aplikace">
+            <h2 class="sidebar-title">AI Laboratoř</h2>
+            <div class="tree-group" data-group="prompts" data-open="true">
+                <button class="tree-parent-button active" data-group="prompts" type="button">Prompty</button>
+                <div class="tree-children">
+                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Textové prompty</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="new-prompt" type="button">Přidat prompt do knihovny</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="custom" type="button">Customní prompt</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="presentation" type="button">Prezentace</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="images" type="button">Obrázky</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="videos" type="button">Videa</button>
+                </div>
+            </div>
+            <div class="tree-group" data-group="tools" data-open="false">
+                <button class="tree-parent-button" data-group="tools" type="button">Nástroje</button>
+                <div class="tree-children">
+                    <button class="tree-leaf-button" data-group="tools" data-page="agents" type="button">Agenti</button>
+                    <button class="tree-leaf-button" data-group="tools" data-page="system-settings" type="button">Systémové nastavení</button>
+                </div>
+            </div>
+            <div class="tree-group" data-group="outputs" data-open="false">
+                <button class="tree-parent-button" data-group="outputs" type="button">Znalosti</button>
+                <div class="tree-children">
+                    <button class="tree-leaf-button" data-group="outputs" data-page="prompt-engineering-theory" type="button">Teorie promptního inženýrství</button>
+                    <button class="tree-leaf-button" data-group="outputs" data-page="copilot-fallback" type="button">Když MS Copilot s tím neporadí...</button>
+                </div>
+            </div>
+        </aside>
+        <div class="app-content">
     <!-- Navigace: výběr kategorie nebo vyhledávání -->
     <nav>
         <div class="library-controls">
             <div class="category-dropdown">
-                <button id="category-button">Vyber kategorii </button>
+                <button id="category-button">Vybrat kategorii </button>
                 <ul id="category-list" class="hidden">
                     <li data-category="all">Všechny kategorie</li>
                 </ul>
@@ -154,6 +176,65 @@
             </div>
         </section>
     </main>
+    <main id="agents-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Agenti</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="system-settings-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Systémové nastavení</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="presentation-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Prezentace</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="images-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Obrázky</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="videos-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Videa</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="prompt-engineering-theory-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Teorie promptního inženýrství</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <main id="copilot-fallback-page" class="hidden">
+        <section class="builder-intro">
+            <h2>Když MS Copilot s tím neporadí...</h2>
+            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+        </section>
+    </main>
+    <div id="startup-page-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="startup-page-title">
+        <section class="dialog-panel delete-modal-panel startup-modal-panel">
+            <h2 id="startup-page-title">Co chceš otevřít?</h2>
+            <div class="startup-page-grid">
+                <button class="startup-page-button section-add-button" data-page="library">Textové prompty</button>
+                <button class="startup-page-button section-add-button" data-page="new-prompt">Přidat prompt</button>
+                <button class="startup-page-button section-add-button" data-page="custom">Customní prompt</button>
+                <button class="startup-page-button section-add-button" data-page="agents">Agenti</button>
+                <button class="startup-page-button section-add-button" data-page="system-settings">Systémové nastavení</button>
+                <button class="startup-page-button section-add-button" data-page="presentation">Prezentace</button>
+                <button class="startup-page-button section-add-button" data-page="images">Obrázky</button>
+                <button class="startup-page-button section-add-button" data-page="videos">Videa</button>
+                <button class="startup-page-button section-add-button" data-page="prompt-engineering-theory">Teorie promptního inženýrství</button>
+                <button class="startup-page-button section-add-button" data-page="copilot-fallback">Když MS Copilot s tím neporadí...</button>
+            </div>
+        </section>
+    </div>
     <div id="delete-prompt-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="delete-prompt-title">
         <section class="dialog-panel delete-modal-panel">
             <h2 id="delete-prompt-title">Smazat tento prompt?</h2>
@@ -185,12 +266,14 @@
             </div>
         </section>
     </div>
-    <!-- Patička s metadaty projektu -->
-    <footer>
-        <p>Verze: 0.08 (pro release 0.0.2)</p>
-        <p>Poslední commit: 24.03.2025 </p>
-        <p>Kontakt: nilyassov@koop.cz </p>
-    </footer>
+        <!-- Patička s metadaty projektu -->
+        <footer>
+            <p>Verze: 0.09 (pro release 0.0.2)</p>
+            <p>Poslední commit: 31.03.2025 </p>
+            <p>Kontakt: nilyassov@koop.cz </p>
+        </footer>
+        </div>
+    </div>
     <!-- Načtení aplikační logiky -->
     <script src="script.js"></script>
 </body>

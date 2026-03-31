@@ -57,10 +57,19 @@ const promptContainer = document.getElementById('prompt-container');
 const searchInput = document.getElementById('search-input');
 const categoryButton = document.getElementById('category-button');
 const categoryList = document.getElementById('category-list');
-const pageButtons = document.querySelectorAll('.page-button');
+const treeParentButtons = document.querySelectorAll('.tree-parent-button');
+const treeGroups = document.querySelectorAll('.tree-group');
+const pageButtons = document.querySelectorAll('.tree-leaf-button');
 const libraryPage = document.getElementById('library-page');
 const customPage = document.getElementById('custom-page');
 const newPromptPage = document.getElementById('new-prompt-page');
+const agentsPage = document.getElementById('agents-page');
+const systemSettingsPage = document.getElementById('system-settings-page');
+const presentationPage = document.getElementById('presentation-page');
+const imagesPage = document.getElementById('images-page');
+const videosPage = document.getElementById('videos-page');
+const promptEngineeringTheoryPage = document.getElementById('prompt-engineering-theory-page');
+const copilotFallbackPage = document.getElementById('copilot-fallback-page');
 const libraryControls = document.querySelector('.library-controls');
 const navElement = document.querySelector('nav');
 const builderCards = document.querySelectorAll('.builder-card');
@@ -86,6 +95,29 @@ const closeEditPromptButton = document.getElementById('close-edit-prompt');
 const deletePromptModal = document.getElementById('delete-prompt-modal');
 const confirmDeletePromptButton = document.getElementById('confirm-delete-prompt');
 const cancelDeletePromptButton = document.getElementById('cancel-delete-prompt');
+const startupPageModal = document.getElementById('startup-page-modal');
+const startupPageButtons = document.querySelectorAll('.startup-page-button');
+const startupOpenDefaultButton = document.getElementById('startup-open-default');
+const startupCloseButton = document.getElementById('startup-close');
+
+const PAGE_HIERARCHY = {
+    'library': { group: 'prompts' },
+    'new-prompt': { group: 'prompts' },
+    'custom': { group: 'prompts' },
+    'presentation': { group: 'prompts' },
+    'images': { group: 'prompts' },
+    'videos': { group: 'prompts' },
+    'agents': { group: 'tools' },
+    'system-settings': { group: 'tools' },
+    'prompt-engineering-theory': { group: 'outputs' },
+    'copilot-fallback': { group: 'outputs' }
+};
+
+const GROUP_DEFAULT_PAGE = {
+    'prompts': 'library',
+    'tools': 'agents',
+    'outputs': 'prompt-engineering-theory'
+};
 
 // localStorage klíč pro ukládání promptů
 const STORAGE_KEY = 'customPrompts';
@@ -349,26 +381,51 @@ function toggleBuilderCards(shouldHide) {
     }
 }
 
+function setActiveGroup(group) {
+    treeGroups.forEach(treeGroup => {
+        const isActiveGroup = treeGroup.dataset.group === group;
+        if (isActiveGroup) {
+            treeGroup.dataset.open = 'true';
+        }
+    });
+
+    treeParentButtons.forEach(button => {
+        const isActiveGroup = button.dataset.group === group;
+        button.classList.toggle('active', isActiveGroup);
+    });
+}
+
 // Přepne mezi stránkami Knihovna, Customní prompt a Nový prompt
 function setPage(page) {
-    const isLibrary = page === 'library';
-    const isCustom = page === 'custom';
-    const isNewPrompt = page === 'new-prompt';
-    
-    if (libraryPage) {
-        libraryPage.classList.toggle('hidden', !isLibrary);
-    }
-    if (customPage) {
-        customPage.classList.toggle('hidden', !isCustom);
-    }
-    if (newPromptPage) {
-        newPromptPage.classList.toggle('hidden', !isNewPrompt);
-    }
+    const resolvedPage = PAGE_HIERARCHY[page] ? page : 'library';
+    const metadata = PAGE_HIERARCHY[resolvedPage];
+
+    setActiveGroup(metadata.group);
+
+    const pageMap = {
+        'library': libraryPage,
+        'custom': customPage,
+        'new-prompt': newPromptPage,
+        'agents': agentsPage,
+        'system-settings': systemSettingsPage,
+        'presentation': presentationPage,
+        'images': imagesPage,
+        'videos': videosPage,
+        'prompt-engineering-theory': promptEngineeringTheoryPage,
+        'copilot-fallback': copilotFallbackPage
+    };
+
+    Object.entries(pageMap).forEach(([key, element]) => {
+        if (element) {
+            element.classList.toggle('hidden', key !== resolvedPage);
+        }
+    });
+
     if (navElement) {
-        navElement.classList.toggle('hidden', !isLibrary);
+        navElement.classList.toggle('hidden', resolvedPage !== 'library');
     }
     pageButtons.forEach(button => {
-        button.classList.toggle('active', button.dataset.page === page);
+        button.classList.toggle('active', button.dataset.page === resolvedPage);
     });
 }
 
@@ -376,6 +433,22 @@ function setPage(page) {
 pageButtons.forEach(button => {
     button.addEventListener('click', () => {
         setPage(button.dataset.page);
+    });
+});
+
+treeParentButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const group = button.dataset.group;
+        if (!group) {
+            return;
+        }
+        const groupElement = document.querySelector(`.tree-group[data-group="${group}"]`);
+        if (!groupElement) {
+            return;
+        }
+
+        const isOpen = groupElement.dataset.open === 'true';
+        groupElement.dataset.open = isOpen ? 'false' : 'true';
     });
 });
 
@@ -518,6 +591,27 @@ function closeDeleteConfirmDialog() {
     deletePromptModal.classList.add('hidden');
     document.body.classList.remove('modal-open');
     pendingDelete = null;
+}
+
+function openStartupPageDialog() {
+    if (!startupPageModal) {
+        return;
+    }
+    startupPageModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    document.body.classList.add('startup-open');
+    if (startupPageButtons.length > 0) {
+        startupPageButtons[0].focus();
+    }
+}
+
+function closeStartupPageDialog() {
+    if (!startupPageModal) {
+        return;
+    }
+    startupPageModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    document.body.classList.remove('startup-open');
 }
 
 function confirmDeletePrompt() {
@@ -687,7 +781,38 @@ if (deletePromptModal) {
     });
 }
 
+startupPageButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const page = button.dataset.page;
+        if (!page) {
+            return;
+        }
+        setPage(page);
+        closeStartupPageDialog();
+    });
+});
+
+if (startupOpenDefaultButton) {
+    startupOpenDefaultButton.addEventListener('click', () => {
+        setPage('library');
+        closeStartupPageDialog();
+    });
+}
+
+if (startupCloseButton) {
+    startupCloseButton.addEventListener('click', closeStartupPageDialog);
+}
+
+if (startupPageModal) {
+    startupPageModal.addEventListener('click', (event) => {
+        if (event.target === startupPageModal) {
+            closeStartupPageDialog();
+        }
+    });
+}
+
 // === KONEC FUNKCÍ PRO NOVOU STRÁNKU ===
 
 setPage('library');
 updateXmlOutput();
+openStartupPageDialog();
