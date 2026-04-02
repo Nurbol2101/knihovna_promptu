@@ -1,5 +1,5 @@
 // Seznam všech promptů dostupných v aplikaci
-const prompts = [
+let prompts = [
     {
         category: '#denní_přehled',
         title: 'Denní briefing z M365',
@@ -47,9 +47,22 @@ const prompts = [
     }
 ];
 
-// Přidá interní klíče vestavěným promptům pro editaci
+const DEFAULT_PROMPT_IDS = [
+    'daily-briefing-m365',
+    'meeting-wrapup-action-items',
+    'one-to-one-prep',
+    'polite-decline-proposal',
+    'brainstorm-notes-proposal',
+    'excel-trend-analysis',
+    'word-to-powerpoint-storyboard',
+    'project-status-overview',
+    'project-risk-analysis'
+]
+
 prompts.forEach((prompt, index) => {
-    prompt.builtinId = `builtin-${index}`;
+    if (!prompt.id) {
+        prompt.id = DEFAULT_PROMPT_IDS[index] || `default-${index}`;
+    }
 });
 
 // Reference na klíčové prvky v DOMu
@@ -78,6 +91,14 @@ const xmlOutput = document.getElementById('xml-output');
 const copyXmlButton = document.getElementById('copy-xml');
 const builderToolbar = document.getElementById('builder-toolbar');
 const builderSections = document.getElementById('builder-sections');
+const fabContainer = document.querySelector('.fab-container');
+const fabButton = document.getElementById('fab-button');
+const fabMenu = document.getElementById('fab-menu');
+const fabBackdrop = document.getElementById('fab-backdrop');
+const fabNewPromptButton = document.getElementById('fab-new-prompt');
+const fabImportUserDataButton = document.getElementById('fab-import-userdata');
+const fabExportUserDataButton = document.getElementById('fab-export-userdata');
+const importUserDataInput = document.getElementById('import-userdata-input');
 
 // Reference pro novou stránku
 const newPromptCategory = document.getElementById('new-prompt-category');
@@ -119,37 +140,165 @@ const GROUP_DEFAULT_PAGE = {
     'outputs': 'prompt-engineering-theory'
 };
 
-// localStorage klíč pro ukládání promptů
-const STORAGE_KEY = 'customPrompts';
+// localStorage klíč pro ukládání stavu promptů
+const PROMPT_STATE_KEY = 'promptLibraryState';
+const LEGACY_CUSTOM_PROMPTS_KEY = 'customPrompts';
 let currentEditTarget = null;
 let pendingDelete = null;
 
-// Načte vlastní prompty z localStorage
+function createEmptyPromptState() {
+    return {
+        version: 1,
+        customPrompts: [],
+        hiddenDefaultIds: [],
+        defaultOverrides: {}
+    };
+}
+
+function normalizePromptState(promptState) {
+    const safePromptState = promptState && typeof promptState === 'object' ? promptState : {};
+
+    return {
+        ...createEmptyPromptState(),
+        ...safePromptState,
+        customPrompts: Array.isArray(safePromptState.customPrompts) ? safePromptState.customPrompts : [],
+        hiddenDefaultIds: Array.isArray(safePromptState.hiddenDefaultIds) ? safePromptState.hiddenDefaultIds : [],
+        defaultOverrides: safePromptState.defaultOverrides && typeof safePromptState.defaultOverrides === 'object' ? safePromptState.defaultOverrides : {}
+    };
+}
+
+function loadPromptState() {
+    try {
+        const stored = localStorage.getItem(PROMPT_STATE_KEY);
+        if (stored) {
+            return normalizePromptState(JSON.parse(stored));
+        }
+
+        const legacyStored = localStorage.getItem(LEGACY_CUSTOM_PROMPTS_KEY);
+        if (legacyStored) {
+            const customPrompts = JSON.parse(legacyStored);
+            if (Array.isArray(customPrompts)) {
+                const migratedState = normalizePromptState({ customPrompts });
+                localStorage.setItem(PROMPT_STATE_KEY, JSON.stringify(migratedState));
+                localStorage.removeItem(LEGACY_CUSTOM_PROMPTS_KEY);
+                return migratedState;
+            }
+        }
+
+        return createEmptyPromptState();
+    } catch (error) {
+        console.error('Chyba při načítání stavu promptů:', error);
+        return createEmptyPromptState();
+    }
+}
+
+function savePromptState(promptState) {
+    try {
+        const normalizedState = normalizePromptState(promptState);
+        localStorage.setItem(PROMPT_STATE_KEY, JSON.stringify(normalizedState));
+        return normalizedState;
+    } catch (error) {
+        console.error('Chyba při ukládání stavu promptů:', error);
+        return null;
+    }
+}
+
+function savePromptStateToStorage(promptState) {
+    const savedState = savePromptState(promptState);
+    return savedState !== null;
+}
+
 function loadCustomPrompts() {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        return stored ? JSON.parse(stored) : [];
-    } catch (error) {
-        console.error('Chyba při načítání promptů:', error);
-        return [];
-    }
+    return loadPromptState().customPrompts;
 }
 
-// Uloží vlastní prompty do localStorage
 function saveCustomPrompts(customPrompts) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(customPrompts));
-        return true;
-    } catch (error) {
-        console.error('Chyba při ukládání promptů:', error);
-        return false;
-    }
+    const promptState = loadPromptState();
+    promptState.customPrompts = customPrompts;
+    return savePromptStateToStorage(promptState);
 }
 
-// Spojí vestavěné a vlastní prompty
+function loadJsonFile(filePath) {
+    return fetch(filePath, { cache: 'no-store' })
+        .then(response => (response.ok ? response.json() : null))
+        .catch(error => {
+            console.warn(`Nepodařilo se načíst ${filePath}:`, error);
+            return null;
+        });
+}
+
+function loadDefaultPrompts() {
+    return loadJsonFile('defaults.json').then(jsonData => {
+        if (!Array.isArray(jsonData)) {
+            return prompts.map(prompt => ({ ...prompt }));
+        }
+
+        return jsonData
+            .filter(prompt => prompt && typeof prompt === 'object')
+            .map((prompt, index) => ({
+                id: typeof prompt.id === 'string' ? prompt.id : (DEFAULT_PROMPT_IDS[index] || `default-${index}`),
+                category: prompt.category || '',
+                title: prompt.title || '',
+                content: prompt.content || ''
+            }));
+    });
+}
+
+function downloadJsonFile(fileName, data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const downloadLink = document.createElement('a');
+    const objectUrl = URL.createObjectURL(blob);
+    downloadLink.href = objectUrl;
+    downloadLink.download = fileName;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+}
+
+function exportUserData() {
+    downloadJsonFile('userdata.json', loadPromptState());
+    showToast('userdata.json byl exportován');
+}
+
+function importUserData(file) {
+    if (!file) {
+        return;
+    }
+
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+        try {
+            const parsed = JSON.parse(String(fileReader.result || '{}'));
+            const normalizedState = normalizePromptState(parsed);
+            savePromptStateToStorage(normalizedState);
+            displayPrompts(getAllPrompts());
+            generateCategories();
+            showToast('userdata.json byl načten');
+        } catch (error) {
+            console.error('Chyba při importu userdata.json:', error);
+            showToast('userdata.json se nepodařilo načíst');
+        }
+    };
+    fileReader.readAsText(file, 'utf-8');
+}
+
 function getAllPrompts() {
     const customPrompts = loadCustomPrompts();
-    return [...customPrompts, ...prompts];
+    const promptState = loadPromptState();
+    const visibleDefaults = prompts
+        .filter(prompt => !promptState.hiddenDefaultIds.includes(prompt.id))
+        .map(prompt => ({
+            ...prompt,
+            ...((promptState.defaultOverrides || {})[prompt.id] || {}),
+            sourceType: 'builtin'
+        }));
+    const customWithSource = customPrompts.map(prompt => ({
+        ...prompt,
+        sourceType: 'custom'
+    }));
+
+    return [...customWithSource, ...visibleDefaults];
 }
 
 // Vykreslí karty promptů podle zadaného filtru
@@ -160,8 +309,8 @@ function displayPrompts(filteredPrompts) {
         card.className = 'prompt-card';
         
         // Kontrola, jestli je to vlastní prompt (má id)
-        const isCustom = prompt.id !== undefined;
-        const promptKey = isCustom ? prompt.id : prompt.builtinId;
+        const isCustom = prompt.sourceType === 'custom';
+        const promptKey = prompt.id;
         const deleteButton = `<button class="delete-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}" data-label="Smazat" aria-label="Smazat" title="Smazat">❌</button>`;
         const editButton = `<button class="edit-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}" data-label="Editovat" aria-label="Editovat" title="Editovat">🔧</button>`;
         
@@ -424,6 +573,13 @@ function setPage(page) {
     if (navElement) {
         navElement.classList.toggle('hidden', resolvedPage !== 'library');
     }
+    if (fabContainer) {
+        const shouldShowFab = resolvedPage === 'library';
+        fabContainer.classList.toggle('hidden', !shouldShowFab);
+        if (!shouldShowFab) {
+            closeFabMenu();
+        }
+    }
     pageButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.page === resolvedPage);
     });
@@ -539,11 +695,7 @@ function clearForm() {
 }
 
 function getPromptByTarget(source, key) {
-    if (source === 'custom') {
-        const customPrompts = loadCustomPrompts();
-        return customPrompts.find(prompt => prompt.id === key) || null;
-    }
-    return prompts.find(prompt => prompt.builtinId === key) || null;
+    return getAllPrompts().find(prompt => prompt.id === key && prompt.sourceType === source) || null;
 }
 
 function openEditPromptDialog(source, key) {
@@ -654,20 +806,27 @@ function saveEditedPrompt() {
             title,
             content
         };
-
         if (!saveCustomPrompts(customPrompts)) {
             showToast('✗ Chyba při ukládání promptu');
             return;
         }
     } else {
-        const builtinPrompt = prompts.find(prompt => prompt.builtinId === currentEditTarget.key);
+        const promptState = loadPromptState();
+        const builtinPrompt = prompts.find(prompt => prompt.id === currentEditTarget.key);
         if (!builtinPrompt) {
             showToast('Prompt nebyl nalezen');
             return;
         }
-        builtinPrompt.category = category;
-        builtinPrompt.title = title;
-        builtinPrompt.content = content;
+        promptState.defaultOverrides[currentEditTarget.key] = {
+            category,
+            title,
+            content
+        };
+
+        if (!savePromptStateToStorage(promptState)) {
+            showToast('✗ Chyba při ukládání promptu');
+            return;
+        }
     }
 
     closeEditPromptDialog();
@@ -698,7 +857,7 @@ function saveNewPrompt() {
     
     // Vytvoř nový prompt s jedinečným ID
     const newPrompt = {
-        id: Date.now().toString(),
+        id: `custom-${Date.now().toString()}`,
         category: formattedCategory,
         title: title,
         content: content
@@ -731,12 +890,23 @@ function deletePrompt(source, key) {
             return;
         }
     } else {
-        const targetIndex = prompts.findIndex(prompt => prompt.builtinId === key);
-        if (targetIndex === -1) {
+        const promptState = loadPromptState();
+        const targetPrompt = prompts.find(prompt => prompt.id === key);
+        if (!targetPrompt) {
             showToast('Prompt nebyl nalezen');
             return;
         }
-        prompts.splice(targetIndex, 1);
+        if (!promptState.hiddenDefaultIds.includes(key)) {
+            promptState.hiddenDefaultIds.push(key);
+        }
+        if (promptState.defaultOverrides[key]) {
+            delete promptState.defaultOverrides[key];
+        }
+
+        if (!savePromptStateToStorage(promptState)) {
+            showToast('✗ Chyba při mazání promptu');
+            return;
+        }
     }
 
     showToast('✓ Prompt smazán');
@@ -783,7 +953,8 @@ if (deletePromptModal) {
 
 startupPageButtons.forEach(button => {
     button.addEventListener('click', () => {
-        const page = button.dataset.page;
+        const group = button.dataset.group;
+        const page = group ? GROUP_DEFAULT_PAGE[group] : null;
         if (!page) {
             return;
         }
@@ -811,8 +982,100 @@ if (startupPageModal) {
     });
 }
 
+function closeFabMenu() {
+    if (!fabMenu || !fabButton) {
+        return;
+    }
+    fabMenu.classList.add('hidden');
+    if (fabBackdrop) {
+        fabBackdrop.classList.add('hidden');
+    }
+    fabButton.setAttribute('aria-expanded', 'false');
+    fabButton.textContent = '＋';
+}
+
+function toggleFabMenu() {
+    if (!fabMenu || !fabButton) {
+        return;
+    }
+    const isHidden = fabMenu.classList.contains('hidden');
+    fabMenu.classList.toggle('hidden', !isHidden);
+    if (fabBackdrop) {
+        fabBackdrop.classList.toggle('hidden', !isHidden ? true : false);
+    }
+    fabButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    fabButton.textContent = isHidden ? '×' : '＋';
+}
+
+if (fabButton) {
+    fabButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleFabMenu();
+    });
+}
+
+if (fabBackdrop) {
+    fabBackdrop.addEventListener('click', closeFabMenu);
+}
+
+if (fabNewPromptButton) {
+    fabNewPromptButton.addEventListener('click', () => {
+        setPage('new-prompt');
+        closeFabMenu();
+    });
+}
+
+if (fabImportUserDataButton && importUserDataInput) {
+    fabImportUserDataButton.addEventListener('click', () => {
+        closeFabMenu();
+        importUserDataInput.click();
+    });
+
+    importUserDataInput.addEventListener('change', (event) => {
+        const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+        importUserData(file);
+        importUserDataInput.value = '';
+    });
+}
+
+if (fabExportUserDataButton) {
+    fabExportUserDataButton.addEventListener('click', () => {
+        exportUserData();
+        closeFabMenu();
+    });
+}
+
+document.addEventListener('click', (event) => {
+    if (!fabMenu || !fabButton) {
+        return;
+    }
+    if (fabMenu.classList.contains('hidden')) {
+        return;
+    }
+    if (fabMenu.contains(event.target) || fabButton.contains(event.target)) {
+        return;
+    }
+    closeFabMenu();
+});
+
 // === KONEC FUNKCÍ PRO NOVOU STRÁNKU ===
 
-setPage('library');
-updateXmlOutput();
-openStartupPageDialog();
+function initializeAppData() {
+    return loadDefaultPrompts().then(defaultPromptList => {
+        prompts = defaultPromptList;
+        const promptState = loadPromptState();
+        savePromptStateToStorage(promptState);
+        displayPrompts(getAllPrompts());
+        generateCategories();
+        setPage('library');
+        updateXmlOutput();
+    });
+}
+
+initializeAppData().catch(error => {
+    console.error('Chyba při inicializaci aplikace:', error);
+    setPage('library');
+    updateXmlOutput();
+}).finally(() => {
+    openStartupPageDialog();
+});

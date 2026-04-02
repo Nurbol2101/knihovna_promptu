@@ -14,18 +14,17 @@
             <div class="tree-group" data-group="prompts" data-open="true">
                 <button class="tree-parent-button active" data-group="prompts" type="button">Prompty</button>
                 <div class="tree-children">
-                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Textové prompty</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="new-prompt" type="button">Přidat prompt do knihovny</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="custom" type="button">Customní prompt</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="presentation" type="button">Prezentace</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="images" type="button">Obrázky</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="videos" type="button">Videa</button>
+                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Tvé textové prompty</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="custom" type="button">Vytvořit customní prompt</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="presentation" type="button">Prompty pro prezentaci</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="images" type="button">Prompty pro obrázky</button>
+                    <button class="tree-leaf-button" data-group="prompts" data-page="videos" type="button">Prompty pro videa</button>
                 </div>
             </div>
             <div class="tree-group" data-group="tools" data-open="false">
                 <button class="tree-parent-button" data-group="tools" type="button">Nástroje</button>
                 <div class="tree-children">
-                    <button class="tree-leaf-button" data-group="tools" data-page="agents" type="button">Agenti</button>
+                    <button class="tree-leaf-button" data-group="tools" data-page="agents" type="button">Pokyny pro agenta</button>
                     <button class="tree-leaf-button" data-group="tools" data-page="system-settings" type="button">Systémové nastavení</button>
                 </div>
             </div>
@@ -220,18 +219,32 @@
     </main>
     <div id="startup-page-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="startup-page-title">
         <section class="dialog-panel delete-modal-panel startup-modal-panel">
-            <h2 id="startup-page-title">Co chceš otevřít?</h2>
+            <div class="startup-hero-copy">
+                <p class="startup-eyebrow">AI Laboratoř</p>
+                <h2 id="startup-page-title">Kde chceš začít?</h2>
+            </div>
             <div class="startup-page-grid">
-                <button class="startup-page-button section-add-button" data-page="library">Textové prompty</button>
-                <button class="startup-page-button section-add-button" data-page="new-prompt">Přidat prompt</button>
-                <button class="startup-page-button section-add-button" data-page="custom">Customní prompt</button>
-                <button class="startup-page-button section-add-button" data-page="agents">Agenti</button>
-                <button class="startup-page-button section-add-button" data-page="system-settings">Systémové nastavení</button>
-                <button class="startup-page-button section-add-button" data-page="presentation">Prezentace</button>
-                <button class="startup-page-button section-add-button" data-page="images">Obrázky</button>
-                <button class="startup-page-button section-add-button" data-page="videos">Videa</button>
-                <button class="startup-page-button section-add-button" data-page="prompt-engineering-theory">Teorie promptního inženýrství</button>
-                <button class="startup-page-button section-add-button" data-page="copilot-fallback">Když MS Copilot s tím neporadí...</button>
+                <button class="startup-page-button section-add-button" data-group="prompts" type="button">
+                    <span class="startup-page-icon">◉</span>
+                    <span class="startup-page-content">
+                        <span class="startup-page-title">Prompty</span>
+                        <span class="startup-page-description">Knihovna promptů, vytvoření vlastního promptu a další</span>
+                    </span>
+                </button>
+                <button class="startup-page-button section-add-button" data-group="tools" type="button">
+                    <span class="startup-page-icon">◌</span>
+                    <span class="startup-page-content">
+                        <span class="startup-page-title">Nástroje</span>
+                        <span class="startup-page-description">Agenti a systémové nastavení v jednom přehledném bloku</span>
+                    </span>
+                </button>
+                <button class="startup-page-button section-add-button" data-group="outputs" type="button">
+                    <span class="startup-page-icon">◎</span>
+                    <span class="startup-page-content">
+                        <span class="startup-page-title">Znalosti</span>
+                        <span class="startup-page-description">Teorie a poznámky</span>
+                    </span>
+                </button>
             </div>
         </section>
     </div>
@@ -265,6 +278,16 @@
                 <button id="close-edit-prompt" class="secondary-button">Zpět</button>
             </div>
         </section>
+    </div>
+    <div id="fab-backdrop" class="fab-backdrop hidden" aria-hidden="true"></div>
+    <div class="fab-container" aria-label="Rychlé akce">
+        <button id="fab-button" class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu">＋</button>
+        <div id="fab-menu" class="fab-menu hidden">
+            <button id="fab-new-prompt" class="fab-menu-item" type="button">Přidat prompt do knihovny</button>
+            <button id="fab-import-userdata" class="fab-menu-item" type="button">Načíst soubor s prompty</button>
+            <button id="fab-export-userdata" class="fab-menu-item" type="button">Exportovat svoje prompty</button>
+        </div>
+        <input type="file" id="import-userdata-input" accept="application/json,.json" class="hidden">
     </div>
         <!-- Patička s metadaty projektu -->
         <footer>
