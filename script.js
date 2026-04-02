@@ -162,8 +162,8 @@ function displayPrompts(filteredPrompts) {
         // Kontrola, jestli je to vlastní prompt (má id)
         const isCustom = prompt.id !== undefined;
         const promptKey = isCustom ? prompt.id : prompt.builtinId;
-        const deleteButton = `<button class="delete-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}">Smazat</button>`;
-        const editButton = `<button class="edit-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}">Editovat</button>`;
+        const deleteButton = `<button class="delete-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}" data-label="Smazat" aria-label="Smazat" title="Smazat">❌</button>`;
+        const editButton = `<button class="edit-button" data-source="${isCustom ? 'custom' : 'builtin'}" data-key="${promptKey}" data-label="Editovat" aria-label="Editovat" title="Editovat">🔧</button>`;
         
         card.innerHTML = `
             <h2>${prompt.title}</h2>
@@ -171,7 +171,7 @@ function displayPrompts(filteredPrompts) {
             <p>${prompt.content}</p>
             <div class="card-actions">
                 ${editButton}
-                <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}">Kopírovat!</button>
+                <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}" data-label="Kopírovat" aria-label="Kopírovat" title="Kopírovat">🗐</button>
                 ${deleteButton}
             </div>
         `;
