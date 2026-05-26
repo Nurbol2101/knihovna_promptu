@@ -1,0 +1,27 @@
+[
+  
+  {
+    "id": "images-social-banner",
+    "category": "#obrázky",
+    "title": "Banner pro sociální sítě",
+    "content": "Vytvoř vizuál pro LinkedIn banner v češtině. Důraz dej na čitelnost, čistou kompozici, dostatek negativního prostoru pro text, profesionální vzhled a moderní business estetiku."
+  },
+  {
+    "id": "images-consistent-style-set",
+    "category": "#obrázky",
+    "title": "Sada obrázků ve stejném stylu",
+    "content": "Vytvoř sadu obrázků se stejným vizuálním stylem napříč několika scénami. Zachovej stejnou atmosféru, materiály, objektiv, osvětlení, barevnost i kompoziční pravidla, aby všechny výstupy působily jako jedna konzistentní série."
+  },
+  {
+    "id": "images-thumbnail-clickable",
+    "category": "#obrázky",
+    "title": "Miniatura nebo thumbnail s vysokým CTR",
+    "content": "Vytvoř thumbnail nebo miniaturu, která bude čitelná i v malém rozměru a bude mít vysoký CTR potenciál. Použij silný kontrast, jednoduchý hlavní motiv, jasný fokus, výrazné emoce a kompozici vhodnou pro YouTube nebo video náhled."
+  },
+  {
+    "id": "images-prompt-polisher",
+    "category": "#obrázky",
+    "title": "Varianta obrazu podle hrubého nápadu",
+    "content": "Vytvoř z hrubého nápadu hotový vizuál pro image model. Doplň kompozici, styl, světlo, barvy, detailnost, poměr stran a negativní prvky tak, aby výstup byl okamžitě použitelný a působil profesionálně."
+  }
+]

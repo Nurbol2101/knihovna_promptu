@@ -14,11 +14,10 @@
             <div class="tree-group" data-group="prompts" data-open="true">
                 <button class="tree-parent-button active" data-group="prompts" type="button">Prompty</button>
                 <div class="tree-children">
-                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Tvé textové prompty</button>
                     <button class="tree-leaf-button" data-group="prompts" data-page="custom" type="button">Vytvořit customní prompt</button>
+                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Tvé textové prompty</button>
                     <button class="tree-leaf-button" data-group="prompts" data-page="presentation" type="button">Prompty pro prezentaci</button>
                     <button class="tree-leaf-button" data-group="prompts" data-page="images" type="button">Prompty pro obrázky</button>
-                    <button class="tree-leaf-button" data-group="prompts" data-page="videos" type="button">Prompty pro videa</button>
                 </div>
             </div>
             <div class="tree-group" data-group="tools" data-open="false">
@@ -178,43 +177,105 @@
     <main id="agents-page" class="hidden">
         <section class="builder-intro">
             <h2>Agenti</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Prompty pro agentní instrukce, vícekrokové úlohy, výzkum a autonomní workflow.</p>
         </section>
     </main>
     <main id="system-settings-page" class="hidden">
         <section class="builder-intro">
             <h2>Systémové instrukce</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Systémové role, tón odpovědí, pravidla chování a pevné guardraily pro model.</p>
         </section>
     </main>
     <main id="presentation-page" class="hidden">
         <section class="builder-intro">
             <h2>Prezentace</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Prompty pro osnovy, storytelling, slide-by-slide strukturu a speaker notes v češtině.</p>
         </section>
     </main>
     <main id="images-page" class="hidden">
         <section class="builder-intro">
             <h2>Obrázky</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Prompty pro generování obrázků, vizuálních stylů, bannerů a produktových mockupů.</p>
         </section>
     </main>
     <main id="videos-page" class="hidden">
         <section class="builder-intro">
             <h2>Videa</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Prompty pro videa, storyboardy, krátké klipy a social-first obsah.</p>
         </section>
     </main>
     <main id="prompt-engineering-theory-page" class="hidden">
         <section class="builder-intro">
             <h2>Teorie promptního inženýrství</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Zde najdeš stručný přehled zásad a konkrétní doporučení — bez prompt karet, pouze text.</p>
+        </section>
+        <section class="markdown-page">
+            <div class="markdown-content">
+                <h3>Co je prompt engineering</h3>
+                <p>Prompt engineering je disciplína, která se zabývá formulací vstupních instrukcí pro jazykové a multimodální modely tak, aby výstupy byly přesné, použitelné a opakovatelné. Důležitá je struktura, jasnost a očekávaný formát výsledku.</p>
+
+                <h4>Základní části dobrého promptu</h4>
+                <ul>
+                    <li><strong>Role:</strong> Kdo má model být (např. seniorní konzultant).</li>
+                    <li><strong>Úkol:</strong> Co přesně má model udělat (analýza, shrnutí, návrh).</li>
+                    <li><strong>Kontext:</strong> Potřebné pozadí, data a omezení.</li>
+                    <li><strong>Formát:</strong> Jaký výstup očekáváš (tabulka, odrážky, e-mail).</li>
+                    <li><strong>Příklady:</strong> Pokud chceš specifický styl, ukaž příklad.</li>
+                </ul>
+
+                <h4>Praktická pravidla</h4>
+                <ol>
+                    <li>Začni stručně: uveď roli a úkol v první větě.</li>
+                    <li>Urči formát výstupu — model pak ví, jak strukturovat odpověď.</li>
+                    <li>Omez rozsah: požaduj např. „maximálně 6 bodů“ nebo „shrnutí na 150 slov“.</li>
+                    <li>Přidej příklad očekávaného výstupu, pokud je to možné.</li>
+                    <li>Iteruj: pokud výstup není ideální, uprav prompt a znovu ho zkusit.</li>
+                </ol>
+
+                <h4>Ukázka (vzorek promptu)</h4>
+                <pre><code>Role: Jsi seniorní konzultant pro interní prezentace.
+Úkol: Z přiloženého textu vytvoř 6 slideů: Úvod, Problém, Data, Řešení, Dopad, Doporučení.
+Kontext: Publikum jsou technicky zdatní manažeři; použij formální tón, česky.
+Formát: Pro každý slide uveď nadpis a 3 krátké odrážky. Do poznámek napiš 2 věty, co říct nahlas.
+</code></pre>
+
+                <h4>Co nepoužívat</h4>
+                <p>Nevkládej do promptu více odlišných úkolů najednou, nepoužívej vágní měřítka a nevyžaduj znalosti, které model nemusí mít (např. interní data bez přístupu).</p>
+            </div>
         </section>
     </main>
     <main id="copilot-fallback-page" class="hidden">
         <section class="builder-intro">
             <h2>Když MS Copilot s tím neporadí...</h2>
-            <p>Tady zatím nic není. Prosím, vraťte se později😊</p>
+            <p>Praktické doporučení — žádné prompt karty, pouze textové návody a tipy.</p>
+        </section>
+        <section class="markdown-page">
+            <div class="markdown-content">
+                <h3>Kdy Copilot nestačí</h3>
+                <p>MS Copilot je skvělý tam, kde je důležitá integrace do Microsoft 365 a jednoduché úpravy. Není ale vždy nejlepší volba, například když:</p>
+                <ul>
+                    <li>potřebuješ důkladný výzkum s citacemi a odkazy na zdroje;</li>
+                    <li>pracuješ s dlouhými texty, které vyžadují sofistikované úpravy stylu;</li>
+                    <li>potřebuješ pokročilé vizuální nástroje pro prezentační design nebo motion;</li>
+                    <li>chceš produkční kvalitu videí nebo komplexní storyboardy.</li>
+                </ul>
+
+                <h4>Alternativy a kdy je použít</h4>
+                <ul>
+                    <li><strong>Prezentace:</strong> Gamma, Tome, Canva, Beautiful.ai — lepší pro hotové slide-decky a design.</li>
+                    <li><strong>Výzkum a ověřování:</strong> Perplexity, ChatGPT, Claude — lepší práce se zdroji a citacemi.</li>
+                    <li><strong>Texty a tone-of-voice:</strong> ChatGPT nebo Claude — silnější kontrola stylu a rolí.</li>
+                    <li><strong>Video:</strong> Runway, Pika — specializované na generování a editaci videa.</li>
+                    <li><strong>Grafika:</strong> Canva, Adobe Express — snadná tvorba brandových materiálů a šablon.</li>
+                </ul>
+
+                <h4>Praktický postup</h4>
+                <ol>
+                    <li>Urči jasně cíl výstupu (design, research, text, video).</li>
+                    <li>Zvol nástroj podle cíle (integrace vs. kvalita výstupu).</li>
+                    <li>Pro testování udělej malý pilotní úkol a porovnej výsledky.</li>
+                </ol>
+            </div>
         </section>
     </main>
     <div id="startup-page-modal" class="dialog-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="startup-page-title">

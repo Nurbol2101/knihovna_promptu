@@ -1,69 +1,33 @@
-// Seznam všech promptů dostupných v aplikaci
-let prompts = [
-    {
-        category: '#denní_přehled',
-        title: 'Denní briefing z M365',
-        content: 'Jsi můj asistent produktivity v Microsoft 365. Prohledej moje e‑maily, zprávy v Teams a kalendář za posledních 7 dní a vytvoř souhrn, co mám řešit dnes a zítra. Výstup rozděl do dvou sekcí: 1) Schůzky – čas, název, 1–2 věty shrnutí a co si mám připravit; 2) Akční položky – úkol, kdo jej zadal, termín, doporučený další krok. '
-    },
-    {
-        category: '#proběhlá_schůzka',
-        title: 'Okamžitý zápis a úkoly z proběhlé schůzky',
-        content: 'Jako můj seniorní projektový manažer analyzuj transkript právě ukončené schůzky {DOPLŇ NÁZEV SCHŮZKY}. Ignoruj nezávaznou konverzaci (small talk). Výstup zformátuj do tabulky s následujícími sloupci: 1) Rozhodnutí (co bylo finálně schváleno), 2) Otevřené otázky (co se nevyřešilo), 3) Úkoly (konkrétní krok, jméno odpovědné osoby, termín splnění). Na závěr přidej sekci "Sentiment schůzky" – jaká byla nálada týmu.'
-    },
-    {
-        category: '#1:1_schůzka',
-        title: 'Příprava na 1:1 schůzku s kolegou',
-        content: 'Připrav mě na schůzku s kolegou {DOPLŇ JMÉNO KOLEGY}. Prohledej naše společné e-maily, chaty v Teams a sdílené soubory za posledních 30 dní. Vypiš: 1) Hlavní témata, která jsme řešili, 2) Jakékoli nedořešené problémy nebo témata, 3) Úkoly, které mi měl dodat on, nebo já jemu. Vytvoř z toho stručnou agendu v odrážkách.'
-    },
-    {
-        category: '#odmítnutí_pozvánky',
-        title: 'Diplomatické odmítnutí pozvánky/projektu',
-        content: 'Pomoz mi napsat e-mailovou odpověď na zprávu od {DOPLŇ JMÉNO OSOBY}, kde musím odmítnout jejich pozvánku/nabídku z důvodu plné kapacity. Zachovej velmi zdvořilý a profesionální tón, poděkuj za důvěru a navrhni, že se k tomu můžeme vrátit v {DOPLŇ DOBU}. Výstup by měl být empatický, ale zároveň pevný v odmítnutí.'
-    },
-    {
-        category: '#hrubé_poznámky',
-        title: 'Přeměna poznámek na profesionální návrh',
-        content: 'Jsi seniorní konzultant. Mám zde hrubé poznámky z brainstormingu (viz soubor {DOPLŇ NÁZEV SOUBORU} nebo vložený text{DOPLŇ TEXT}).  Přepiš tyto poznámky do strukturovaného  návrhu ve Wordu struktury: 1) Manažerské shrnutí, 2) Analýza současného stavu, 3) Navrhované řešení, 4) Odhadované přínosy. Text ať je formální a přesvědčivý.'
-    },
-    {
-        category: '#excel_agent_trendy',
-        title: 'Hledání trendů v chaotické tabulce',
-        content: ' Jsi datový analytik. Podívej se na data v tomto excelovém listu. Nechci vidět jen čísla, ale příběh za nimi. 1) Identifikuj 3 hlavní trendy za poslední období. 2) Najdi jakékoli anomálie nebo odlehlé hodnoty, které by měly upoutat mou pozornost. 3) Navrhni, jaký typ grafu by tato data nejlépe vizualizoval pro prezentaci vedení.'
-    },
-    {
-        category: '#powerpoint_design',
-        title: 'Vytvoření prezentace z Word dokumentu',
-        content: 'Jsi expert na storytelling. Vytvoř v PowerPointu prezentaci o 10 slidech na základě připojeného dokumentu {DOPLŇ NÁZEV SOUBORU WORD}.  Každý slide musí obsahovat: Nadpis, maximálně 4 stručné odrážky obsahu a do poznámek pro přednášejícího (Speaker Notes) napiš detailní vysvětlení, co mám k danému slidu říkat. Rozvrhni prezentaci na Úvod, Problém, Řešení, Harmonogram a Závěr.'
-    },
-    {
-        category: '#status_projektu',
-        title: 'Status projektu napříč aplikacemi',
-        content: 'Jsi projektový manažer. Potřebuji rychlý přehled o projektu {DOPLŇ NÁZEV PROJEKTU}. Prohledej mé e-maily, chaty v Teams a soubory na OneDrive za posledních 14 dní. Zjisti: Kdo naposledy reportoval nějaký pokrok? Zmínil někdo nějaké zdržení nebo "blocker"? Vytvoř souhrnný report o jedné stránce.'
-    },
-    {
-        category: '#project_management',
-        title: 'Analýza rizik projektu',
-        content: 'Na základě přiloženého plánu projektu {DOPLŇ NÁZEV SOUBORU} identifikuj 5 potenciálních rizik, která by mohla ohrozit termín dodání nebo rozpočet. U každého rizika odhadni pravděpodobnost (Vysoká/Střední/Nízká) a navrhni konkrétní mitigační opatření (jak riziku předejít).'
-    }
-];
+// Seznam vestavěných promptů dostupných v aplikaci
+let builtinPrompts = [];
 
-const DEFAULT_PROMPT_IDS = [
-    'daily-briefing-m365',
-    'meeting-wrapup-action-items',
-    'one-to-one-prep',
-    'polite-decline-proposal',
-    'brainstorm-notes-proposal',
-    'excel-trend-analysis',
-    'word-to-powerpoint-storyboard',
-    'project-status-overview',
-    'project-risk-analysis'
-]
+const PROMPT_SECTION_FILES = {
+    text: 'prompts/text.json',
+    presentation: 'prompts/presentation.json',
+    images: 'prompts/images.json',
+    videos: 'prompts/videos.json',
+    agent: 'prompts/agent.json',
+    system: 'prompts/system.json',
+    theory: 'prompts/theory.md',
+    other: 'prompts/other.md'
+};
 
-prompts.forEach((prompt, index) => {
-    if (!prompt.id) {
-        prompt.id = DEFAULT_PROMPT_IDS[index] || `default-${index}`;
-    }
-});
+const PAGE_PROMPT_SECTION = {
+    library: 'text',
+    presentation: 'presentation',
+    images: 'images',
+    videos: 'videos',
+    agents: 'agent',
+    'system-settings': 'system',
+    'prompt-engineering-theory': 'theory',
+    'copilot-fallback': 'other'
+};
+
+const CARD_PAGES = new Set(['library', 'presentation', 'images', 'videos', 'agents', 'system-settings']);
+
+let currentPage = 'library';
+let currentSearchTerm = '';
+let currentCategory = 'all';
 
 // Reference na klíčové prvky v DOMu
 const promptContainer = document.getElementById('prompt-container');
@@ -121,6 +85,10 @@ const startupPageButtons = document.querySelectorAll('.startup-page-button');
 const startupOpenDefaultButton = document.getElementById('startup-open-default');
 const startupCloseButton = document.getElementById('startup-close');
 
+if (promptContainer) {
+    promptContainer.classList.add('prompt-container');
+}
+
 const PAGE_HIERARCHY = {
     'library': { group: 'prompts' },
     'new-prompt': { group: 'prompts' },
@@ -163,7 +131,8 @@ function normalizePromptState(promptState) {
         ...safePromptState,
         customPrompts: Array.isArray(safePromptState.customPrompts) ? safePromptState.customPrompts : [],
         hiddenDefaultIds: Array.isArray(safePromptState.hiddenDefaultIds) ? safePromptState.hiddenDefaultIds : [],
-        defaultOverrides: safePromptState.defaultOverrides && typeof safePromptState.defaultOverrides === 'object' ? safePromptState.defaultOverrides : {}
+        defaultOverrides: safePromptState.defaultOverrides && typeof safePromptState.defaultOverrides === 'object' ? safePromptState.defaultOverrides : {},
+        order: Array.isArray(safePromptState.order) ? safePromptState.order : []
     };
 }
 
@@ -227,21 +196,638 @@ function loadJsonFile(filePath) {
         });
 }
 
-function loadDefaultPrompts() {
-    return loadJsonFile('defaults.json').then(jsonData => {
-        if (!Array.isArray(jsonData)) {
-            return prompts.map(prompt => ({ ...prompt }));
+function loadTextFile(filePath) {
+    return fetch(filePath, { cache: 'no-store' })
+        .then(response => (response.ok ? response.text() : null))
+        .catch(error => {
+            console.warn(`Nepodařilo se načíst ${filePath}:`, error);
+            return null;
+        });
+}
+
+function normalizeBuiltinPrompt(prompt, section, index) {
+    const safePrompt = prompt && typeof prompt === 'object' ? prompt : {};
+
+    return {
+        id: typeof safePrompt.id === 'string' && safePrompt.id.trim()
+            ? safePrompt.id
+            : `${section}-${index}`,
+        category: typeof safePrompt.category === 'string' ? safePrompt.category : '',
+        title: typeof safePrompt.title === 'string' ? safePrompt.title : '',
+        content: typeof safePrompt.content === 'string' ? safePrompt.content : '',
+        section
+    };
+}
+
+function loadBuiltinPrompts() {
+    const sectionEntries = Object.entries(PROMPT_SECTION_FILES);
+    return Promise.all(sectionEntries.map(([section, filePath]) => {
+        if (filePath.endsWith('.md')) {
+            return loadTextFile(filePath).then(text => ({ section, text, isMarkdown: true }));
         }
 
-        return jsonData
-            .filter(prompt => prompt && typeof prompt === 'object')
-            .map((prompt, index) => ({
-                id: typeof prompt.id === 'string' ? prompt.id : (DEFAULT_PROMPT_IDS[index] || `default-${index}`),
-                category: prompt.category || '',
-                title: prompt.title || '',
-                content: prompt.content || ''
-            }));
+        return loadJsonFile(filePath).then(jsonData => ({ section, jsonData }));
+    })).then(results => {
+        const loadedPrompts = [];
+
+        results.forEach(entry => {
+            const { section } = entry;
+
+            if (entry.isMarkdown) {
+                const mdContent = typeof entry.text === 'string' ? entry.text : '';
+                loadedPrompts.push({
+                    id: `${section}-md`,
+                    category: '',
+                    title: '',
+                    content: mdContent,
+                    section,
+                    isMarkdown: true
+                });
+                return;
+            }
+
+            const jsonData = entry.jsonData;
+            if (!Array.isArray(jsonData)) {
+                return;
+            }
+
+            jsonData
+                .filter(prompt => prompt && typeof prompt === 'object')
+                .forEach((prompt, index) => {
+                    loadedPrompts.push(normalizeBuiltinPrompt(prompt, section, index));
+                });
+        });
+
+        return loadedPrompts;
     });
+}
+
+function renderMarkdownToHtml(md) {
+    if (!md) return '';
+
+    const escapeHtml = (text) => text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const renderInline = (text) => {
+        let html = escapeHtml(text);
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer noopener">$1</a>');
+        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
+        return html;
+    };
+
+    const lines = md.replace(/\r\n/g, '\n').split('\n');
+    const blocks = [];
+    let paragraphLines = [];
+    let listItems = [];
+    let listType = null;
+    let quoteLines = [];
+    let inCodeBlock = false;
+    let codeBuffer = [];
+
+    const flushParagraph = () => {
+        if (!paragraphLines.length) return;
+        blocks.push(`<p>${renderInline(paragraphLines.join(' '))}</p>`);
+        paragraphLines = [];
+    };
+
+    const flushList = () => {
+        if (!listItems.length || !listType) return;
+        const tag = listType === 'ol' ? 'ol' : 'ul';
+        blocks.push(`<${tag}>${listItems.map(item => `<li>${renderInline(item)}</li>`).join('')}</${tag}>`);
+        listItems = [];
+        listType = null;
+    };
+
+    const flushQuote = () => {
+        if (!quoteLines.length) return;
+        blocks.push(`<blockquote>${quoteLines.map(line => `<p>${renderInline(line)}</p>`).join('')}</blockquote>`);
+        quoteLines = [];
+    };
+
+    const flushCode = () => {
+        if (!inCodeBlock) return;
+        blocks.push(`<pre><code>${escapeHtml(codeBuffer.join('\n'))}</code></pre>`);
+        codeBuffer = [];
+        inCodeBlock = false;
+    };
+
+    const flushAll = () => {
+        flushParagraph();
+        flushList();
+        flushQuote();
+    };
+
+    for (const rawLine of lines) {
+        const line = rawLine.trimEnd();
+        const trimmed = line.trim();
+
+        if (trimmed.startsWith('```')) {
+            if (inCodeBlock) {
+                flushCode();
+            } else {
+                flushAll();
+                inCodeBlock = true;
+            }
+            continue;
+        }
+
+        if (inCodeBlock) {
+            codeBuffer.push(rawLine);
+            continue;
+        }
+
+        if (!trimmed) {
+            flushAll();
+            continue;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
+        if (headingMatch) {
+            flushAll();
+            const level = Math.min(6, headingMatch[1].length + 1);
+            blocks.push(`<h${level}>${renderInline(headingMatch[2])}</h${level}>`);
+            continue;
+        }
+
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+            flushAll();
+            blocks.push('<hr/>');
+            continue;
+        }
+
+        const quoteMatch = trimmed.match(/^>\s?(.*)$/);
+        if (quoteMatch) {
+            flushParagraph();
+            flushList();
+            quoteLines.push(quoteMatch[1]);
+            continue;
+        }
+
+        const unorderedMatch = trimmed.match(/^[-*+]\s+(.+)$/);
+        const orderedMatch = trimmed.match(/^\d+[.)]\s+(.+)$/);
+        if (unorderedMatch || orderedMatch) {
+            flushParagraph();
+            flushQuote();
+            const nextType = unorderedMatch ? 'ul' : 'ol';
+            if (listType && listType !== nextType) {
+                flushList();
+            }
+            listType = nextType;
+            listItems.push((unorderedMatch || orderedMatch)[1]);
+            continue;
+        }
+
+        flushQuote();
+        flushList();
+        paragraphLines.push(line);
+    }
+
+    flushAll();
+    flushCode();
+
+    return blocks.join('');
+}
+
+function getPromptSectionForPage(page) {
+    if (page === 'library') {
+        return 'text';
+    }
+
+    return PAGE_PROMPT_SECTION[page] || null;
+}
+
+// --- Drag & drop reordering for prompt cards ---
+function initPromptCardDrag() {
+    if (!promptContainer) return;
+
+    let dragged = null;
+    let placeholder = null;
+    let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
+    let dragPointerId = null;
+    let dragStartTimer = null;
+    let pendingDragCard = null;
+    let pendingDragEvent = null;
+    let pendingPointerId = null;
+    let holdStartX = 0;
+    let holdStartY = 0;
+    // auto-scroll while dragging near viewport edges
+    let autoScrollInterval = null;
+    let autoScrollDirection = 0; // -1 = up, 1 = down, 0 = none
+    let lastClientX = 0, lastClientY = 0;
+    const EDGE_SCROLL_THRESHOLD = 80; // px from viewport edge to start scrolling
+    const EDGE_SCROLL_MAX_SPEED = 24; // px per interval
+    const HYSTERESIS_PX = 12; // spatial hysteresis to avoid flicker when near center
+    const DRAG_HOLD_DELAY_MS = 200;
+    const DRAG_CANCEL_DISTANCE_PX = 6;
+    let lastNearestEl = null;
+    let lastInsertBefore = null;
+
+    function clearPendingDrag() {
+        if (dragStartTimer) {
+            clearTimeout(dragStartTimer);
+            dragStartTimer = null;
+        }
+        pendingDragCard = null;
+        pendingDragEvent = null;
+        pendingPointerId = null;
+    }
+
+    function startDrag(card, e) {
+        dragged = card;
+        dragPointerId = e.pointerId;
+
+        const rect = card.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        offsetX = startX - rect.left;
+        offsetY = startY - rect.top;
+
+        // create placeholder to keep layout
+        placeholder = document.createElement('div');
+        placeholder.className = 'prompt-card placeholder';
+        placeholder.style.width = `${rect.width}px`;
+
+        // style dragged card as fixed so it can follow the pointer
+        card.classList.add('dragging');
+        card.style.position = 'fixed';
+        card.style.left = `${rect.left}px`;
+        card.style.top = `${rect.top}px`;
+        card.style.width = `${rect.width}px`;
+        card.style.pointerEvents = 'none';
+        card.style.zIndex = 10000;
+
+        // insert placeholder where the card currently is to preserve layout
+        if (card.parentNode === promptContainer) {
+            promptContainer.insertBefore(placeholder, card);
+        } else {
+            promptContainer.appendChild(placeholder);
+        }
+
+        // capture the pointer so we reliably receive pointerup
+        try { card.setPointerCapture && card.setPointerCapture(e.pointerId); } catch (err) {}
+
+        // show grid styling on container
+        promptContainer.classList.add('drag-grid');
+
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp, { once: true });
+    }
+
+    function startAutoScroll(dir) {
+        autoScrollDirection = dir;
+        if (autoScrollInterval) return;
+        autoScrollInterval = setInterval(() => {
+            if (!autoScrollDirection) return;
+            const h = window.innerHeight;
+            let dist = 0;
+            if (autoScrollDirection === -1) {
+                dist = Math.max(0, EDGE_SCROLL_THRESHOLD - lastClientY);
+            } else {
+                dist = Math.max(0, lastClientY - (h - EDGE_SCROLL_THRESHOLD));
+            }
+            const speed = Math.max(2, Math.ceil((dist / EDGE_SCROLL_THRESHOLD) * EDGE_SCROLL_MAX_SPEED));
+            window.scrollBy(0, autoScrollDirection * speed);
+        }, 50);
+    }
+
+    function stopAutoScroll() {
+        if (autoScrollInterval) {
+            clearInterval(autoScrollInterval);
+            autoScrollInterval = null;
+        }
+        autoScrollDirection = 0;
+    }
+
+    const onPointerDown = (e) => {
+        const card = e.target.closest('.prompt-card');
+        if (!card || (e.button && e.button !== 0)) return; // only left mouse
+
+        // Delay drag start so clicks on action buttons stay clicks.
+        clearPendingDrag();
+        pendingDragCard = card;
+        pendingDragEvent = e;
+        holdStartX = e.clientX;
+        holdStartY = e.clientY;
+        pendingPointerId = e.pointerId;
+
+        dragStartTimer = setTimeout(() => {
+            if (!pendingDragCard || !pendingDragEvent) return;
+            startDrag(pendingDragCard, pendingDragEvent);
+            clearPendingDrag();
+        }, DRAG_HOLD_DELAY_MS);
+
+        const onPendingMove = (moveEvent) => {
+            if (!pendingDragCard || moveEvent.pointerId !== pendingPointerId) return;
+            const movedX = Math.abs(moveEvent.clientX - holdStartX);
+            const movedY = Math.abs(moveEvent.clientY - holdStartY);
+            if (movedX > DRAG_CANCEL_DISTANCE_PX || movedY > DRAG_CANCEL_DISTANCE_PX) {
+                clearPendingDrag();
+                window.removeEventListener('pointermove', onPendingMove);
+                window.removeEventListener('pointerup', onPendingUp);
+                window.removeEventListener('pointercancel', onPendingCancel);
+            }
+        };
+
+        const onPendingUp = (upEvent) => {
+            if (upEvent.pointerId !== pendingPointerId) return;
+            clearPendingDrag();
+            window.removeEventListener('pointermove', onPendingMove);
+            window.removeEventListener('pointerup', onPendingUp);
+            window.removeEventListener('pointercancel', onPendingCancel);
+        };
+
+        const onPendingCancel = (cancelEvent) => {
+            if (cancelEvent.pointerId !== pendingPointerId) return;
+            clearPendingDrag();
+            window.removeEventListener('pointermove', onPendingMove);
+            window.removeEventListener('pointerup', onPendingUp);
+            window.removeEventListener('pointercancel', onPendingCancel);
+        };
+
+        window.addEventListener('pointermove', onPendingMove);
+        window.addEventListener('pointerup', onPendingUp, { once: true });
+        window.addEventListener('pointercancel', onPendingCancel, { once: true });
+    };
+
+    const onPointerMove = (e) => {
+        if (!dragged) return;
+        const clientX = e.clientX;
+        const clientY = e.clientY;
+        lastClientX = clientX;
+        lastClientY = clientY;
+        dragged.style.left = `${clientX - offsetX}px`;
+        dragged.style.top = `${clientY - offsetY}px`;
+
+        // auto-scroll when near top or bottom of viewport
+        let desiredDir = 0;
+        if (clientY < EDGE_SCROLL_THRESHOLD) desiredDir = -1;
+        else if (clientY > window.innerHeight - EDGE_SCROLL_THRESHOLD) desiredDir = 1;
+        if (desiredDir !== autoScrollDirection) {
+            if (desiredDir === 0) stopAutoScroll(); else startAutoScroll(desiredDir);
+        }
+
+        const children = Array.from(promptContainer.querySelectorAll('.prompt-card'))
+            .filter(el => el !== dragged && el !== placeholder);
+
+        const containerRect = promptContainer.getBoundingClientRect();
+        const adjX = Math.min(Math.max(clientX, containerRect.left + 1), containerRect.right - 1);
+        const adjY = Math.min(Math.max(clientY, containerRect.top + 1), containerRect.bottom - 1);
+
+        if (children.length === 0) {
+            if (placeholder.parentNode !== promptContainer) promptContainer.appendChild(placeholder);
+            return;
+        }
+
+        const metrics = children.map(child => {
+            const rect = child.getBoundingClientRect();
+            return {
+                el: child,
+                left: rect.left,
+                right: rect.right,
+                top: rect.top,
+                bottom: rect.bottom,
+                cx: rect.left + rect.width / 2,
+                cy: rect.top + rect.height / 2,
+                width: rect.width,
+                height: rect.height,
+            };
+        });
+
+        const averageHeight = metrics.reduce((sum, item) => sum + item.height, 0) / metrics.length;
+        const rowTolerance = Math.max(24, averageHeight * 0.6);
+
+        const rows = [];
+        for (const item of metrics.sort((a, b) => a.cy - b.cy || a.cx - b.cx)) {
+            const row = rows[rows.length - 1];
+            if (!row || Math.abs(item.cy - row.centerY) > rowTolerance) {
+                rows.push({
+                    cards: [item],
+                    centerY: item.cy,
+                    top: item.top,
+                    bottom: item.bottom,
+                });
+            } else {
+                row.cards.push(item);
+                row.centerY = row.cards.reduce((sum, card) => sum + card.cy, 0) / row.cards.length;
+                row.top = Math.min(row.top, item.top);
+                row.bottom = Math.max(row.bottom, item.bottom);
+            }
+        }
+
+        let targetRow = rows[0];
+        let targetRowDistance = Infinity;
+        for (const row of rows) {
+            const distance = adjY < row.top ? row.top - adjY : adjY > row.bottom ? adjY - row.bottom : 0;
+            if (distance < targetRowDistance) {
+                targetRowDistance = distance;
+                targetRow = row;
+            }
+        }
+
+        if (!targetRow || targetRow.cards.length === 0) {
+            if (placeholder.parentNode !== promptContainer) promptContainer.appendChild(placeholder);
+            return;
+        }
+
+        const orderedRowCards = targetRow.cards.sort((a, b) => a.left - b.left || a.top - b.top);
+        let targetCard = orderedRowCards[0];
+        let insertBeforeEl = true;
+
+        if (adjX <= orderedRowCards[0].cx) {
+            targetCard = orderedRowCards[0];
+            insertBeforeEl = true;
+        } else if (adjX >= orderedRowCards[orderedRowCards.length - 1].cx) {
+            targetCard = orderedRowCards[orderedRowCards.length - 1];
+            insertBeforeEl = false;
+        } else {
+            for (const card of orderedRowCards) {
+                if (adjX < card.cx) {
+                    targetCard = card;
+                    insertBeforeEl = true;
+                    break;
+                }
+                targetCard = card;
+                insertBeforeEl = false;
+            }
+        }
+
+        const deltaX = adjX - targetCard.cx;
+        if (Math.abs(deltaX) < HYSTERESIS_PX && targetCard.el === lastNearestEl) {
+            return;
+        }
+
+        if (targetCard.el !== lastNearestEl || insertBeforeEl !== lastInsertBefore) {
+            if (insertBeforeEl) {
+                if (targetCard.el.previousSibling !== placeholder) promptContainer.insertBefore(placeholder, targetCard.el);
+            } else {
+                const next = targetCard.el.nextSibling;
+                if (next !== placeholder) {
+                    if (next) promptContainer.insertBefore(placeholder, next);
+                    else promptContainer.appendChild(placeholder);
+                }
+            }
+            lastNearestEl = targetCard.el;
+            lastInsertBefore = insertBeforeEl;
+        }
+    };
+
+    const onPointerUp = (e) => {
+        if (!dragged) return;
+        // insert dragged at placeholder position
+        promptContainer.insertBefore(dragged, placeholder);
+
+        // cleanup styles
+        dragged.classList.remove('dragging');
+        dragged.style.position = '';
+        dragged.style.left = '';
+        dragged.style.top = '';
+        dragged.style.width = '';
+        dragged.style.pointerEvents = '';
+        dragged.style.zIndex = '';
+
+        if (placeholder && placeholder.parentNode) placeholder.parentNode.removeChild(placeholder);
+        placeholder = null;
+
+        // persist new order
+        try {
+            const ids = Array.from(promptContainer.querySelectorAll('.prompt-card')).map(c => c.dataset.id).filter(Boolean);
+            const state = loadPromptState();
+            state.order = ids;
+            savePromptStateToStorage(state);
+        } catch (err) {
+            console.warn('Nepodařilo se uložit pořadí karet:', err);
+        }
+
+        // release pointer capture if available
+        try { dragged.releasePointerCapture && dragged.releasePointerCapture(e.pointerId); } catch (err) {}
+
+        // stop any auto-scrolling
+        stopAutoScroll();
+
+        // reset hysteresis trackers
+        lastNearestEl = null;
+        lastInsertBefore = null;
+        dragPointerId = null;
+
+        dragged = null;
+
+        promptContainer.classList.remove('drag-grid');
+
+        window.removeEventListener('pointermove', onPointerMove);
+    };
+
+    // Hover tooltip removed; using native `title` + `aria-label` instead
+
+    // Start dragging via pointerdown (handles mouse and touch)
+    promptContainer.addEventListener('pointerdown', onPointerDown);
+}
+
+// Initialize drag support after DOM loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initPromptCardDrag();
+});
+
+function getPageElement(page) {
+    const pageMap = {
+        library: libraryPage,
+        custom: customPage,
+        'new-prompt': newPromptPage,
+        agents: agentsPage,
+        'system-settings': systemSettingsPage,
+        presentation: presentationPage,
+        images: imagesPage,
+        videos: videosPage,
+        'prompt-engineering-theory': promptEngineeringTheoryPage,
+        'copilot-fallback': copilotFallbackPage
+    };
+
+    return pageMap[page] || null;
+}
+
+function ensurePromptContainer(page) {
+    const pageElement = getPageElement(page);
+    if (!pageElement) {
+        return null;
+    }
+
+    const existingContainer = pageElement.querySelector('.prompt-container');
+    if (existingContainer) {
+        return existingContainer;
+    }
+
+    const container = document.createElement('div');
+    container.className = 'prompt-container';
+    pageElement.appendChild(container);
+    return container;
+}
+
+function getVisibleBuiltinPrompts() {
+    const promptState = loadPromptState();
+    return builtinPrompts.filter(prompt => !promptState.hiddenDefaultIds.includes(prompt.id));
+}
+
+function getLibraryPrompts() {
+    const promptState = loadPromptState();
+    const customPrompts = loadCustomPrompts().map(prompt => ({
+        ...prompt,
+        sourceType: 'custom'
+    }));
+
+    const builtinLibraryPrompts = getVisibleBuiltinPrompts()
+        .filter(prompt => prompt.section === 'text')
+        .map(prompt => ({
+            ...prompt,
+            ...((promptState.defaultOverrides || {})[prompt.id] || {}),
+            sourceType: 'builtin'
+        }));
+
+    return [...customPrompts, ...builtinLibraryPrompts];
+}
+
+function getPromptsForPage(page) {
+    if (page === 'library') {
+        let promptsForLibrary = getLibraryPrompts();
+
+        if (currentCategory !== 'all') {
+            promptsForLibrary = promptsForLibrary.filter(prompt => prompt.category === currentCategory);
+        }
+
+        if (currentSearchTerm) {
+            promptsForLibrary = promptsForLibrary.filter(prompt =>
+                normalizeString(prompt.title).includes(currentSearchTerm) ||
+                normalizeString(prompt.category).includes(currentSearchTerm) ||
+                normalizeString(prompt.content).includes(currentSearchTerm)
+            );
+        }
+
+        return promptsForLibrary;
+    }
+
+    const promptSection = getPromptSectionForPage(page);
+    if (!promptSection) {
+        return [];
+    }
+
+    return getVisibleBuiltinPrompts()
+        .filter(prompt => prompt.section === promptSection)
+        .map(prompt => ({
+            ...prompt,
+            sourceType: 'builtin'
+        }));
+}
+
+function refreshVisiblePrompts() {
+    if (CARD_PAGES.has(currentPage) || currentPage === 'library') {
+        renderPromptsForCurrentPage();
+    }
+
+    if (currentPage === 'library') {
+        generateCategories();
+    }
 }
 
 function downloadJsonFile(fileName, data) {
@@ -272,8 +858,7 @@ function importUserData(file) {
             const parsed = JSON.parse(String(fileReader.result || '{}'));
             const normalizedState = normalizePromptState(parsed);
             savePromptStateToStorage(normalizedState);
-            displayPrompts(getAllPrompts());
-            generateCategories();
+            refreshVisiblePrompts();
             showToast('userdata.json byl načten');
         } catch (error) {
             console.error('Chyba při importu userdata.json:', error);
@@ -286,7 +871,7 @@ function importUserData(file) {
 function getAllPrompts() {
     const customPrompts = loadCustomPrompts();
     const promptState = loadPromptState();
-    const visibleDefaults = prompts
+    const visibleDefaults = getVisibleBuiltinPrompts()
         .filter(prompt => !promptState.hiddenDefaultIds.includes(prompt.id))
         .map(prompt => ({
             ...prompt,
@@ -301,12 +886,64 @@ function getAllPrompts() {
     return [...customWithSource, ...visibleDefaults];
 }
 
+function renderPromptsForCurrentPage() {
+    if (currentPage === 'library') {
+        const libraryPrompts = getPromptsForPage('library');
+        const libraryContainer = ensurePromptContainer('library');
+        displayPrompts(libraryPrompts, libraryContainer);
+        return;
+    }
+
+    // Special rendering for Markdown-based pages (theory / other)
+    if (currentPage === 'prompt-engineering-theory' || currentPage === 'copilot-fallback') {
+        const promptSection = getPromptSectionForPage(currentPage);
+        const mdPrompt = builtinPrompts.find(p => p.section === promptSection && p.isMarkdown);
+        const pageElement = getPageElement(currentPage);
+        if (!pageElement) return;
+        const container = pageElement.querySelector('.markdown-content');
+        if (container && mdPrompt) {
+            container.innerHTML = renderMarkdownToHtml(mdPrompt.content);
+        }
+        return;
+    }
+
+    if (!CARD_PAGES.has(currentPage)) {
+        return;
+    }
+
+    const pagePrompts = getPromptsForPage(currentPage);
+    const pageContainer = ensurePromptContainer(currentPage);
+    displayPrompts(pagePrompts, pageContainer, { sectionLayout: true });
+}
+
 // Vykreslí karty promptů podle zadaného filtru
-function displayPrompts(filteredPrompts) {
-    promptContainer.innerHTML = '';
-    filteredPrompts.forEach((prompt, index) => {
+function displayPrompts(filteredPrompts, targetContainer, options = {}) {
+    const container = targetContainer || promptContainer;
+    if (!container) {
+        return;
+    }
+
+    // apply stored order if present
+    const promptStateForOrder = loadPromptState();
+    const storedOrder = Array.isArray(promptStateForOrder.order) ? promptStateForOrder.order : [];
+    const orderedPrompts = Array.from(filteredPrompts);
+    if (storedOrder && storedOrder.length) {
+        orderedPrompts.sort((a, b) => {
+            const ia = storedOrder.indexOf(a.id);
+            const ib = storedOrder.indexOf(b.id);
+            const va = ia === -1 ? 1e9 : ia;
+            const vb = ib === -1 ? 1e9 : ib;
+            return va - vb;
+        });
+    }
+
+    container.innerHTML = '';
+    orderedPrompts.forEach((prompt, index) => {
         const card = document.createElement('div');
         card.className = 'prompt-card';
+        if (options.sectionLayout) {
+            card.classList.add('section-prompt-card');
+        }
         
         // Kontrola, jestli je to vlastní prompt (má id)
         const isCustom = prompt.sourceType === 'custom';
@@ -324,11 +961,16 @@ function displayPrompts(filteredPrompts) {
                 ${deleteButton}
             </div>
         `;
-        promptContainer.appendChild(card);
+        // native tooltip + accessibility label
+        card.setAttribute('title', 'podrž a přetáhni kartu pro změnu pozice');
+        card.setAttribute('aria-label', 'Podrž a přetáhni kartu pro změnu pozice');
+        // attach data-id for persistence
+        card.dataset.id = prompt.id;
+        container.appendChild(card);
     });
     
     // Přidání event listenerů na všechna tlačítka Kopírovat
-    document.querySelectorAll('.copy-button').forEach(button => {
+    container.querySelectorAll('.copy-button').forEach(button => {
         button.addEventListener('click', function() {
             const content = this.getAttribute('data-content');
             copyToClipboard(content);
@@ -336,7 +978,7 @@ function displayPrompts(filteredPrompts) {
     });
     
     // Přidání event listenerů na tlačítka Smazat
-    document.querySelectorAll('.delete-button').forEach(button => {
+    container.querySelectorAll('.delete-button').forEach(button => {
         button.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             const key = this.getAttribute('data-key');
@@ -347,7 +989,7 @@ function displayPrompts(filteredPrompts) {
     });
 
     // Přidání event listenerů na tlačítka Editovat
-    document.querySelectorAll('.edit-button').forEach(button => {
+    container.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', function() {
             const source = this.getAttribute('data-source');
             const key = this.getAttribute('data-key');
@@ -356,13 +998,10 @@ function displayPrompts(filteredPrompts) {
     });
 }
 
-// Po načtení stránky zobrazí všechny prompty
-displayPrompts(getAllPrompts());
-
 // Dynamicky generuje kategorie ze souboru prompts
 function generateCategories() {
     // Získat všechny jedinečné kategorie
-    const allPrompts = getAllPrompts();
+    const allPrompts = getLibraryPrompts();
     const categories = [...new Set(allPrompts.map(prompt => prompt.category))].sort();
     
     // Vyčistit stávající kategorie (kromě "Všechny kategorie")
@@ -382,9 +1021,6 @@ function generateCategories() {
     });
 }
 
-// Vygenerovat kategorie při načtení stránky
-generateCategories();
-
 // Funkce pro normalizaci znaků s diakritikou
 function normalizeString(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -392,14 +1028,8 @@ function normalizeString(str) {
 
 // Vyhledávání v reálném čase podle názvu, kategorie i obsahu
 searchInput.addEventListener('input', () => {
-    const searchTerm = normalizeString(searchInput.value);
-    const allPrompts = getAllPrompts();
-    const filteredPrompts = allPrompts.filter(prompt => 
-        normalizeString(prompt.title).includes(searchTerm) || 
-        normalizeString(prompt.category).includes(searchTerm) || 
-        normalizeString(prompt.content).includes(searchTerm)
-    );
-    displayPrompts(filteredPrompts);
+    currentSearchTerm = normalizeString(searchInput.value);
+    renderPromptsForCurrentPage();
 });
 
 
@@ -408,9 +1038,8 @@ searchInput.addEventListener('input', () => {
 categoryList.addEventListener('click', (event) => {
     const selectedCategory = event.target.dataset.category;
     if (selectedCategory) {
-        const allPrompts = getAllPrompts();
-        const filteredPrompts = selectedCategory === 'all' ? allPrompts : allPrompts.filter(prompt => prompt.category === selectedCategory);
-        displayPrompts(filteredPrompts);
+        currentCategory = selectedCategory;
+        renderPromptsForCurrentPage();
         categoryList.classList.add('hidden');
         // Aktualizace textu tlačítka, aby ukazoval vybranou kategorii
         categoryButton.textContent = selectedCategory === 'all' ? 'Všechny kategorie' : selectedCategory;
@@ -548,18 +1177,19 @@ function setActiveGroup(group) {
 function setPage(page) {
     const resolvedPage = PAGE_HIERARCHY[page] ? page : 'library';
     const metadata = PAGE_HIERARCHY[resolvedPage];
+    currentPage = resolvedPage;
 
     setActiveGroup(metadata.group);
 
     const pageMap = {
-        'library': libraryPage,
-        'custom': customPage,
+        library: libraryPage,
+        custom: customPage,
         'new-prompt': newPromptPage,
-        'agents': agentsPage,
+        agents: agentsPage,
         'system-settings': systemSettingsPage,
-        'presentation': presentationPage,
-        'images': imagesPage,
-        'videos': videosPage,
+        presentation: presentationPage,
+        images: imagesPage,
+        videos: videosPage,
         'prompt-engineering-theory': promptEngineeringTheoryPage,
         'copilot-fallback': copilotFallbackPage
     };
@@ -583,6 +1213,8 @@ function setPage(page) {
     pageButtons.forEach(button => {
         button.classList.toggle('active', button.dataset.page === resolvedPage);
     });
+
+    renderPromptsForCurrentPage();
 }
 
 // Obsluha přepínání stránek přes horní tlačítka
@@ -812,7 +1444,7 @@ function saveEditedPrompt() {
         }
     } else {
         const promptState = loadPromptState();
-        const builtinPrompt = prompts.find(prompt => prompt.id === currentEditTarget.key);
+        const builtinPrompt = builtinPrompts.find(prompt => prompt.id === currentEditTarget.key);
         if (!builtinPrompt) {
             showToast('Prompt nebyl nalezen');
             return;
@@ -830,8 +1462,7 @@ function saveEditedPrompt() {
     }
 
     closeEditPromptDialog();
-    generateCategories();
-    displayPrompts(getAllPrompts());
+    refreshVisiblePrompts();
     showToast('✓ Prompt byl upraven');
 }
 
@@ -870,9 +1501,15 @@ function saveNewPrompt() {
     if (saveCustomPrompts(customPrompts)) {
         showToast('✓ Prompt úspěšně uložen!');
         clearForm();
+        currentSearchTerm = '';
+        currentCategory = 'all';
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        if (categoryButton) {
+            categoryButton.textContent = 'Všechny kategorie';
+        }
         generateCategories();
-        // Přepni na knihovnu a zobraz všechny prompty včetně nově přidaného
-        displayPrompts(getAllPrompts());
         setPage('library');
     } else {
         showToast('✗ Chyba při ukládání promptu');
@@ -891,7 +1528,7 @@ function deletePrompt(source, key) {
         }
     } else {
         const promptState = loadPromptState();
-        const targetPrompt = prompts.find(prompt => prompt.id === key);
+        const targetPrompt = builtinPrompts.find(prompt => prompt.id === key);
         if (!targetPrompt) {
             showToast('Prompt nebyl nalezen');
             return;
@@ -910,8 +1547,7 @@ function deletePrompt(source, key) {
     }
 
     showToast('✓ Prompt smazán');
-    displayPrompts(getAllPrompts());
-    generateCategories();
+    refreshVisiblePrompts();
 }
 
 // Event listenery pro novou stránku
@@ -1061,11 +1697,13 @@ document.addEventListener('click', (event) => {
 // === KONEC FUNKCÍ PRO NOVOU STRÁNKU ===
 
 function initializeAppData() {
-    return loadDefaultPrompts().then(defaultPromptList => {
-        prompts = defaultPromptList;
+    return loadBuiltinPrompts().then(defaultPromptList => {
+        builtinPrompts = defaultPromptList;
         const promptState = loadPromptState();
         savePromptStateToStorage(promptState);
-        displayPrompts(getAllPrompts());
+        currentSearchTerm = '';
+        currentCategory = 'all';
+        renderPromptsForCurrentPage();
         generateCategories();
         setPage('library');
         updateXmlOutput();

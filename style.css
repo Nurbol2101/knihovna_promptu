@@ -587,6 +587,7 @@ nav {
     font-size: 18px;
 }
 
+.prompt-container,
 #prompt-container {
     /* Mřížka karet s prompty */
     display: grid;
@@ -732,6 +733,31 @@ nav {
     font-size: 15px;
 }
 
+.section-prompt-card .card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.section-prompt-card .card-actions button {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    bottom: auto !important;
+}
+
+.section-prompt-card .card-actions button::after {
+    left: 50%;
+}
+
+.section-prompt-card .card-actions button:hover::after,
+.section-prompt-card .card-actions button:focus-visible::after {
+    transform: translateX(-50%) translateY(0);
+}
+
 @media (max-width: 1200px) {
     .builder-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -750,6 +776,7 @@ nav {
 }
 
 @media (max-width: 980px) {
+    .prompt-container,
     #prompt-container,
     .builder-grid {
         grid-template-columns: repeat(1, 1fr);
@@ -763,7 +790,7 @@ nav {
     -webkit-backdrop-filter: blur(10px);
     border: 1.5px solid rgba(242, 234, 223, 0.35);
     border-radius: 20px;
-    padding: 30px 20px 20px;
+    padding: 10px 20px 20px;
     position: relative;
     text-align: center;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1);
@@ -772,9 +799,131 @@ nav {
     cursor: pointer;
 }
 
+/* custom mouse-following tooltip removed; using native title attribute */
+
+/* Style applied to the dragged card so it floats above content */
+.prompt-card.dragging {
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.2);
+    transform: scale(1.02);
+    border-color: rgba(120,255,188,0.9);
+}
+
+/* Placeholder appearance where the card will drop */
+.prompt-card.placeholder {
+    background: rgba(255,255,255,0.02);
+    border: 2px dashed rgba(242,234,223,0.12);
+    box-shadow: none;
+    opacity: 0.9;
+}
+
+/* Grid overlay style for the container while dragging */
+.prompt-container.drag-grid {
+    background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px, 40px 40px;
+    transition: background 0.12s ease;
+}
+
+/* Markdown-style pages (no prompt cards) */
+.markdown-page {
+    padding: 0 20px 28px;
+}
+
+.markdown-content {
+    max-width: 920px;
+    padding: 8px 4px 0;
+    margin: 0 auto;
+    color: #f4eee4;
+    line-height: 1.6;
+}
+
+.markdown-content h2,
+.markdown-content h3 {
+    margin: 1.1em 0 0.4em;
+    line-height: 1.2;
+}
+
+.markdown-content h2 {
+    font-size: 34px;
+    margin-top: 0;
+}
+
+.markdown-content h4 {
+    font-size: 20px;
+    margin: 1em 0 0.35em;
+}
+
+.markdown-content p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content blockquote,
+.markdown-content pre,
+.markdown-content hr {
+    margin: 0 0 1em;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    padding-left: 1.4em;
+}
+
+.markdown-content li + li {
+    margin-top: 0.35em;
+}
+
+.markdown-content blockquote {
+    padding-left: 1em;
+    border-left: 3px solid rgba(242, 234, 223, 0.35);
+    color: rgba(244, 238, 228, 0.94);
+}
+
+.markdown-content code {
+    font-family: Consolas, monospace;
+    background: rgba(0, 0, 0, 0.24);
+    padding: 0.08em 0.28em;
+    border-radius: 4px;
+}
+
+.markdown-content pre {
+    background: rgba(0, 0, 0, 0.24);
+    padding: 14px 16px;
+    border-radius: 10px;
+    overflow: auto;
+}
+
+.markdown-content pre code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    display: block;
+    white-space: pre-wrap;
+}
+
+.markdown-content hr {
+    border: 0;
+    border-top: 1px solid rgba(242, 234, 223, 0.24);
+}
+
+/* Prevent prompt-card rules from styling markdown pages */
+.markdown-page .prompt-card { display: none; }
+
+.prompt-card .card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
 /* Samostatné odsazení karet podle sekce */
 #library-page .prompt-card {
-    padding: 60px 20px 20px;
+    padding: 50px 20px 20px;
+}
+
+.section-prompt-card {
+    padding: 50px 20px 20px;
 }
 
 #custom-page .prompt-card {
@@ -816,7 +965,7 @@ nav {
 .prompt-card button {
     /* Tlačítko pro kopírování - Glass style */
     position: absolute;
-    top: 15px;
+    top: 0px;
     right: 15px;
     background: rgba(114, 125, 55, 0.733);
     backdrop-filter: blur(10px);
@@ -829,6 +978,14 @@ nav {
     padding: 8px 16px;
     font-weight: 500;
     transition: all 0.01s ease;
+}
+
+#library-page .prompt-card button {
+    position: absolute;
+}
+
+.section-prompt-card button {
+    position: static;
 }
 
 .edit-button {

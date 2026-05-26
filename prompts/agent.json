@@ -1,0 +1,32 @@
+[
+  {
+    "id": "agent-research-assistant",
+    "category": "#agent",
+    "title": "Výzkumný agent s ověřováním zdrojů",
+    "content": "Jednej jako výzkumný agent. Nejprve si ujasni cíl, pak najdi relevantní zdroje, porovnej je a nakonec shrň závěr s jasným oddělením faktů a domněnek. Pokud něco chybí, napiš, co je potřeba doplnit."
+  },
+  {
+    "id": "agent-project-triage",
+    "category": "#agent",
+    "title": "Agent pro triáž projektu",
+    "content": "Proveď vícekrokovou triáž projektu. Zkontroluj zadání, najdi rizika, navrhni další kroky a seřaď je podle priority. Výstup má být jako akční plán, ne jako dlouhý esej."
+  },
+  {
+    "id": "agent-inbox-summarizer",
+    "category": "#agent",
+    "title": "Agent pro inbox a zprávy",
+    "content": "Zpracuj příchozí zprávy jako agent. Rozděl je na urgentní, čekající, informační a ignorovatelné. Ke každé položce doplň doporučenou odpověď nebo další krok."
+  },
+  {
+    "id": "agent-document-analyst",
+    "category": "#agent",
+    "title": "Agent pro analýzu dokumentů",
+    "content": "Přečti dokumenty jako agent krok za krokem. Vytáhni klíčové body, rozpory, chybějící informace a návrh dalšího postupu. Pokud je to možné, navrhni i otázky pro autora dokumentu."
+  },
+  {
+    "id": "agent-compare-options",
+    "category": "#agent",
+    "title": "Agent pro porovnání variant",
+    "content": "Porovnej několik variant řešení jako agent. U každé varianty zhodnoť náklady, rychlost, rizika, dopad na uživatele a složitost implementace. Nakonec doporuč jednu variantu a zdůvodni proč."
+  }
+]
