@@ -1,33 +1,45 @@
 // Seznam vestavěných promptů dostupných v aplikaci
 let builtinPrompts = [];
 
-const PROMPT_SECTION_FILES = {
-    text: 'prompts/text.json',
-    presentation: 'prompts/presentation.json',
-    images: 'prompts/images.json',
-    videos: 'prompts/videos.json',
-    agent: 'prompts/agent.json',
-    system: 'prompts/system.json',
-    theory: 'prompts/theory.md',
-    other: 'prompts/other.md'
+const PROMPT_SECTION_TYPES = {
+    text: 'json',
+    presentation: 'json',
+    images: 'json',
+    agent: 'json',
+    system: 'json',
+    theory: 'markdown',
+    other: 'markdown'
+};
+
+const HAS_PROMPT_SECTION_SCRIPTS = typeof window !== 'undefined' && !!window.PROMPT_LIBRARY_SECTIONS;
+
+const TEXT_PROMPTS_PAGE = 'text-prompts';
+const FAB_VISIBLE_PAGES = new Set([TEXT_PROMPTS_PAGE, 'presentation', 'images', 'agents', 'system-settings']);
+const FAB_NEW_PROMPT_LABELS = {
+    [TEXT_PROMPTS_PAGE]: 'Přidat prompt do textových promptů',
+    presentation: 'Přidat prompt do prezentace',
+    images: 'Přidat prompt do obrázků',
+    agents: 'Přidat prompt pro agenta',
+    'system-settings': 'Přidat systémovou instrukci'
 };
 
 const PAGE_PROMPT_SECTION = {
-    library: 'text',
+    [TEXT_PROMPTS_PAGE]: 'text',
     presentation: 'presentation',
     images: 'images',
-    videos: 'videos',
     agents: 'agent',
     'system-settings': 'system',
     'prompt-engineering-theory': 'theory',
     'copilot-fallback': 'other'
 };
 
-const CARD_PAGES = new Set(['library', 'presentation', 'images', 'videos', 'agents', 'system-settings']);
+const CARD_PAGES = new Set([TEXT_PROMPTS_PAGE, 'presentation', 'images', 'agents', 'system-settings']);
 
-let currentPage = 'library';
+let currentPage = TEXT_PROMPTS_PAGE;
 let currentSearchTerm = '';
 let currentCategory = 'all';
+let pendingNewPromptSection = 'text';
+let pendingNewPromptPage = TEXT_PROMPTS_PAGE;
 
 // Reference na klíčové prvky v DOMu
 const promptContainer = document.getElementById('prompt-container');
@@ -44,7 +56,6 @@ const agentsPage = document.getElementById('agents-page');
 const systemSettingsPage = document.getElementById('system-settings-page');
 const presentationPage = document.getElementById('presentation-page');
 const imagesPage = document.getElementById('images-page');
-const videosPage = document.getElementById('videos-page');
 const promptEngineeringTheoryPage = document.getElementById('prompt-engineering-theory-page');
 const copilotFallbackPage = document.getElementById('copilot-fallback-page');
 const libraryControls = document.querySelector('.library-controls');
@@ -58,11 +69,7 @@ const builderSections = document.getElementById('builder-sections');
 const fabContainer = document.querySelector('.fab-container');
 const fabButton = document.getElementById('fab-button');
 const fabMenu = document.getElementById('fab-menu');
-const fabBackdrop = document.getElementById('fab-backdrop');
 const fabNewPromptButton = document.getElementById('fab-new-prompt');
-const fabImportUserDataButton = document.getElementById('fab-import-userdata');
-const fabExportUserDataButton = document.getElementById('fab-export-userdata');
-const importUserDataInput = document.getElementById('import-userdata-input');
 
 // Reference pro novou stránku
 const newPromptCategory = document.getElementById('new-prompt-category');
@@ -90,12 +97,11 @@ if (promptContainer) {
 }
 
 const PAGE_HIERARCHY = {
-    'library': { group: 'prompts' },
+    [TEXT_PROMPTS_PAGE]: { group: 'prompts' },
     'new-prompt': { group: 'prompts' },
     'custom': { group: 'prompts' },
     'presentation': { group: 'prompts' },
     'images': { group: 'prompts' },
-    'videos': { group: 'prompts' },
     'agents': { group: 'tools' },
     'system-settings': { group: 'tools' },
     'prompt-engineering-theory': { group: 'outputs' },
@@ -103,7 +109,7 @@ const PAGE_HIERARCHY = {
 };
 
 const GROUP_DEFAULT_PAGE = {
-    'prompts': 'library',
+    'prompts': TEXT_PROMPTS_PAGE,
     'tools': 'agents',
     'outputs': 'prompt-engineering-theory'
 };
@@ -113,6 +119,7 @@ const PROMPT_STATE_KEY = 'promptLibraryState';
 const LEGACY_CUSTOM_PROMPTS_KEY = 'customPrompts';
 let currentEditTarget = null;
 let pendingDelete = null;
+let currentNewPromptTargetPage = TEXT_PROMPTS_PAGE;
 
 function createEmptyPromptState() {
     return {
@@ -177,32 +184,55 @@ function savePromptStateToStorage(promptState) {
     return savedState !== null;
 }
 
+function reconcilePromptStateWithBuiltinPrompts(promptState, defaultPromptList) {
+    const normalizedState = normalizePromptState(promptState);
+    const builtinIds = new Set(
+        defaultPromptList
+            .filter(prompt => prompt && typeof prompt.id === 'string' && prompt.id.trim())
+            .map(prompt => prompt.id)
+    );
+
+    normalizedState.hiddenDefaultIds = normalizedState.hiddenDefaultIds
+        .filter(id => typeof id === 'string' && builtinIds.has(id));
+
+    const filteredOverrides = {};
+    Object.entries(normalizedState.defaultOverrides || {}).forEach(([id, override]) => {
+        if (builtinIds.has(id)) {
+            filteredOverrides[id] = override;
+        }
+    });
+    normalizedState.defaultOverrides = filteredOverrides;
+
+    // Recovery guard: if local state hides every built-in prompt, restore defaults.
+    if (builtinIds.size > 0 && normalizedState.hiddenDefaultIds.length >= builtinIds.size) {
+        normalizedState.hiddenDefaultIds = [];
+    }
+
+    return normalizedState;
+}
+
 function loadCustomPrompts() {
-    return loadPromptState().customPrompts;
+    return loadPromptState().customPrompts.map(prompt => ({
+        ...prompt,
+        section: typeof prompt.section === 'string' && prompt.section ? prompt.section : 'text'
+    }));
 }
 
 function saveCustomPrompts(customPrompts) {
     const promptState = loadPromptState();
-    promptState.customPrompts = customPrompts;
+    promptState.customPrompts = customPrompts.map(prompt => ({
+        ...prompt,
+        section: typeof prompt.section === 'string' && prompt.section ? prompt.section : 'text'
+    }));
     return savePromptStateToStorage(promptState);
 }
 
-function loadJsonFile(filePath) {
-    return fetch(filePath, { cache: 'no-store' })
-        .then(response => (response.ok ? response.json() : null))
-        .catch(error => {
-            console.warn(`Nepodařilo se načíst ${filePath}:`, error);
-            return null;
-        });
-}
+function getSectionScriptData(section) {
+    if (!HAS_PROMPT_SECTION_SCRIPTS) {
+        return null;
+    }
 
-function loadTextFile(filePath) {
-    return fetch(filePath, { cache: 'no-store' })
-        .then(response => (response.ok ? response.text() : null))
-        .catch(error => {
-            console.warn(`Nepodařilo se načíst ${filePath}:`, error);
-            return null;
-        });
+    return window.PROMPT_LIBRARY_SECTIONS[section] ?? null;
 }
 
 function normalizeBuiltinPrompt(prompt, section, index) {
@@ -219,47 +249,47 @@ function normalizeBuiltinPrompt(prompt, section, index) {
     };
 }
 
+function normalizeCustomPrompt(prompt) {
+    const safePrompt = prompt && typeof prompt === 'object' ? prompt : {};
+
+    return {
+        ...safePrompt,
+        section: typeof safePrompt.section === 'string' && safePrompt.section ? safePrompt.section : 'text'
+    };
+}
+
 function loadBuiltinPrompts() {
-    const sectionEntries = Object.entries(PROMPT_SECTION_FILES);
-    return Promise.all(sectionEntries.map(([section, filePath]) => {
-        if (filePath.endsWith('.md')) {
-            return loadTextFile(filePath).then(text => ({ section, text, isMarkdown: true }));
+    const sectionEntries = Object.entries(PROMPT_SECTION_TYPES);
+    const loadedPrompts = [];
+
+    sectionEntries.forEach(([section, sectionType]) => {
+        const sectionData = getSectionScriptData(section);
+
+        if (sectionType === 'markdown') {
+            const mdContent = typeof sectionData === 'string' ? sectionData : '';
+            loadedPrompts.push({
+                id: `${section}-md`,
+                category: '',
+                title: '',
+                content: mdContent,
+                section,
+                isMarkdown: true
+            });
+            return;
         }
 
-        return loadJsonFile(filePath).then(jsonData => ({ section, jsonData }));
-    })).then(results => {
-        const loadedPrompts = [];
+        if (!Array.isArray(sectionData)) {
+            return;
+        }
 
-        results.forEach(entry => {
-            const { section } = entry;
-
-            if (entry.isMarkdown) {
-                const mdContent = typeof entry.text === 'string' ? entry.text : '';
-                loadedPrompts.push({
-                    id: `${section}-md`,
-                    category: '',
-                    title: '',
-                    content: mdContent,
-                    section,
-                    isMarkdown: true
-                });
-                return;
-            }
-
-            const jsonData = entry.jsonData;
-            if (!Array.isArray(jsonData)) {
-                return;
-            }
-
-            jsonData
-                .filter(prompt => prompt && typeof prompt === 'object')
-                .forEach((prompt, index) => {
-                    loadedPrompts.push(normalizeBuiltinPrompt(prompt, section, index));
-                });
-        });
-
-        return loadedPrompts;
+        sectionData
+            .filter(prompt => prompt && typeof prompt === 'object')
+            .forEach((prompt, index) => {
+                loadedPrompts.push(normalizeBuiltinPrompt(prompt, section, index));
+            });
     });
+
+    return Promise.resolve(loadedPrompts);
 }
 
 function renderMarkdownToHtml(md) {
@@ -392,12 +422,25 @@ function renderMarkdownToHtml(md) {
     return blocks.join('');
 }
 
+// Highlight text within curly braces by wrapping it with a span
+function highlightBracedText(text) {
+    if (!text) return text;
+    return text.replace(/\{([^}]+)\}/g, '<span class="braced-text">{$1}</span>');
+}
+
 function getPromptSectionForPage(page) {
-    if (page === 'library') {
+    if (page === TEXT_PROMPTS_PAGE) {
         return 'text';
     }
 
     return PAGE_PROMPT_SECTION[page] || null;
+}
+
+function getCustomPromptsForSection(section) {
+    return loadCustomPrompts().filter(prompt => {
+        const promptSection = typeof prompt.section === 'string' && prompt.section.trim() ? prompt.section : 'text';
+        return promptSection === section;
+    });
 }
 
 // --- Drag & drop reordering for prompt cards ---
@@ -733,14 +776,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function getPageElement(page) {
     const pageMap = {
-        library: libraryPage,
+        [TEXT_PROMPTS_PAGE]: libraryPage,
         custom: customPage,
         'new-prompt': newPromptPage,
         agents: agentsPage,
         'system-settings': systemSettingsPage,
         presentation: presentationPage,
         images: imagesPage,
-        videos: videosPage,
         'prompt-engineering-theory': promptEngineeringTheoryPage,
         'copilot-fallback': copilotFallbackPage
     };
@@ -772,7 +814,7 @@ function getVisibleBuiltinPrompts() {
 
 function getLibraryPrompts() {
     const promptState = loadPromptState();
-    const customPrompts = loadCustomPrompts().map(prompt => ({
+    const customPrompts = getCustomPromptsForSection('text').map(prompt => ({
         ...prompt,
         sourceType: 'custom'
     }));
@@ -789,7 +831,8 @@ function getLibraryPrompts() {
 }
 
 function getPromptsForPage(page) {
-    if (page === 'library') {
+    const promptSection = getPromptSectionForPage(page);
+    if (page === TEXT_PROMPTS_PAGE) {
         let promptsForLibrary = getLibraryPrompts();
 
         if (currentCategory !== 'all') {
@@ -807,65 +850,33 @@ function getPromptsForPage(page) {
         return promptsForLibrary;
     }
 
-    const promptSection = getPromptSectionForPage(page);
     if (!promptSection) {
         return [];
     }
 
-    return getVisibleBuiltinPrompts()
+    const customPrompts = getCustomPromptsForSection(promptSection).map(prompt => ({
+        ...prompt,
+        sourceType: 'custom'
+    }));
+
+    const builtinPromptsForSection = getVisibleBuiltinPrompts()
         .filter(prompt => prompt.section === promptSection)
         .map(prompt => ({
             ...prompt,
             sourceType: 'builtin'
         }));
+
+    return [...customPrompts, ...builtinPromptsForSection];
 }
 
 function refreshVisiblePrompts() {
-    if (CARD_PAGES.has(currentPage) || currentPage === 'library') {
+    if (CARD_PAGES.has(currentPage) || currentPage === TEXT_PROMPTS_PAGE) {
         renderPromptsForCurrentPage();
     }
 
-    if (currentPage === 'library') {
+    if (currentPage === TEXT_PROMPTS_PAGE) {
         generateCategories();
     }
-}
-
-function downloadJsonFile(fileName, data) {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const downloadLink = document.createElement('a');
-    const objectUrl = URL.createObjectURL(blob);
-    downloadLink.href = objectUrl;
-    downloadLink.download = fileName;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    downloadLink.remove();
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-}
-
-function exportUserData() {
-    downloadJsonFile('userdata.json', loadPromptState());
-    showToast('userdata.json byl exportován');
-}
-
-function importUserData(file) {
-    if (!file) {
-        return;
-    }
-
-    const fileReader = new FileReader();
-    fileReader.onload = () => {
-        try {
-            const parsed = JSON.parse(String(fileReader.result || '{}'));
-            const normalizedState = normalizePromptState(parsed);
-            savePromptStateToStorage(normalizedState);
-            refreshVisiblePrompts();
-            showToast('userdata.json byl načten');
-        } catch (error) {
-            console.error('Chyba při importu userdata.json:', error);
-            showToast('userdata.json se nepodařilo načíst');
-        }
-    };
-    fileReader.readAsText(file, 'utf-8');
 }
 
 function getAllPrompts() {
@@ -887,9 +898,9 @@ function getAllPrompts() {
 }
 
 function renderPromptsForCurrentPage() {
-    if (currentPage === 'library') {
-        const libraryPrompts = getPromptsForPage('library');
-        const libraryContainer = ensurePromptContainer('library');
+    if (currentPage === TEXT_PROMPTS_PAGE) {
+        const libraryPrompts = getPromptsForPage(TEXT_PROMPTS_PAGE);
+        const libraryContainer = ensurePromptContainer(TEXT_PROMPTS_PAGE);
         displayPrompts(libraryPrompts, libraryContainer);
         return;
     }
@@ -954,7 +965,7 @@ function displayPrompts(filteredPrompts, targetContainer, options = {}) {
         card.innerHTML = `
             <h2>${prompt.title}</h2>
             <div class="hashtag">${prompt.category}</div>
-            <p>${prompt.content}</p>
+            <p>${highlightBracedText(prompt.content)}</p>
             <div class="card-actions">
                 ${editButton}
                 <button class="copy-button" data-content="${prompt.content.replace(/"/g, '&quot;')}" data-label="Kopírovat" aria-label="Kopírovat" title="Kopírovat">🗐</button>
@@ -1175,21 +1186,20 @@ function setActiveGroup(group) {
 
 // Přepne mezi stránkami Knihovna, Customní prompt a Nový prompt
 function setPage(page) {
-    const resolvedPage = PAGE_HIERARCHY[page] ? page : 'library';
+    const resolvedPage = PAGE_HIERARCHY[page] ? page : TEXT_PROMPTS_PAGE;
     const metadata = PAGE_HIERARCHY[resolvedPage];
     currentPage = resolvedPage;
 
     setActiveGroup(metadata.group);
 
     const pageMap = {
-        library: libraryPage,
+        [TEXT_PROMPTS_PAGE]: libraryPage,
         custom: customPage,
         'new-prompt': newPromptPage,
         agents: agentsPage,
         'system-settings': systemSettingsPage,
         presentation: presentationPage,
         images: imagesPage,
-        videos: videosPage,
         'prompt-engineering-theory': promptEngineeringTheoryPage,
         'copilot-fallback': copilotFallbackPage
     };
@@ -1201,13 +1211,15 @@ function setPage(page) {
     });
 
     if (navElement) {
-        navElement.classList.toggle('hidden', resolvedPage !== 'library');
+        navElement.classList.toggle('hidden', resolvedPage !== TEXT_PROMPTS_PAGE);
     }
     if (fabContainer) {
-        const shouldShowFab = resolvedPage === 'library';
+        const shouldShowFab = FAB_VISIBLE_PAGES.has(resolvedPage);
         fabContainer.classList.toggle('hidden', !shouldShowFab);
         if (!shouldShowFab) {
             closeFabMenu();
+        } else {
+            updateFabMenuLabel(resolvedPage);
         }
     }
     pageButtons.forEach(button => {
@@ -1324,6 +1336,12 @@ function clearForm() {
     if (newPromptCategory) newPromptCategory.value = '';
     if (newPromptTitle) newPromptTitle.value = '';
     if (newPromptContent) newPromptContent.value = '';
+}
+
+function openNewPromptDialogForPage(page) {
+    currentNewPromptTargetPage = page;
+    pendingNewPromptSection = getPromptSectionForPage(page) || 'text';
+    setPage('new-prompt');
 }
 
 function getPromptByTarget(source, key) {
@@ -1491,7 +1509,8 @@ function saveNewPrompt() {
         id: `custom-${Date.now().toString()}`,
         category: formattedCategory,
         title: title,
-        content: content
+        content: content,
+        section: pendingNewPromptSection || 'text'
     };
     
     // Přidej na začátek pole (nejnovější první)
@@ -1510,7 +1529,7 @@ function saveNewPrompt() {
             categoryButton.textContent = 'Všechny kategorie';
         }
         generateCategories();
-        setPage('library');
+        setPage(currentNewPromptTargetPage || TEXT_PROMPTS_PAGE);
     } else {
         showToast('✗ Chyba při ukládání promptu');
     }
@@ -1601,7 +1620,7 @@ startupPageButtons.forEach(button => {
 
 if (startupOpenDefaultButton) {
     startupOpenDefaultButton.addEventListener('click', () => {
-        setPage('library');
+        setPage(TEXT_PROMPTS_PAGE);
         closeStartupPageDialog();
     });
 }
@@ -1623,11 +1642,16 @@ function closeFabMenu() {
         return;
     }
     fabMenu.classList.add('hidden');
-    if (fabBackdrop) {
-        fabBackdrop.classList.add('hidden');
-    }
     fabButton.setAttribute('aria-expanded', 'false');
     fabButton.textContent = '＋';
+}
+
+function updateFabMenuLabel(page) {
+    if (!fabNewPromptButton) {
+        return;
+    }
+
+    fabNewPromptButton.textContent = FAB_NEW_PROMPT_LABELS[page] || 'Přidat prompt';
 }
 
 function toggleFabMenu() {
@@ -1636,9 +1660,6 @@ function toggleFabMenu() {
     }
     const isHidden = fabMenu.classList.contains('hidden');
     fabMenu.classList.toggle('hidden', !isHidden);
-    if (fabBackdrop) {
-        fabBackdrop.classList.toggle('hidden', !isHidden ? true : false);
-    }
     fabButton.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     fabButton.textContent = isHidden ? '×' : '＋';
 }
@@ -1650,33 +1671,9 @@ if (fabButton) {
     });
 }
 
-if (fabBackdrop) {
-    fabBackdrop.addEventListener('click', closeFabMenu);
-}
-
 if (fabNewPromptButton) {
     fabNewPromptButton.addEventListener('click', () => {
-        setPage('new-prompt');
-        closeFabMenu();
-    });
-}
-
-if (fabImportUserDataButton && importUserDataInput) {
-    fabImportUserDataButton.addEventListener('click', () => {
-        closeFabMenu();
-        importUserDataInput.click();
-    });
-
-    importUserDataInput.addEventListener('change', (event) => {
-        const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
-        importUserData(file);
-        importUserDataInput.value = '';
-    });
-}
-
-if (fabExportUserDataButton) {
-    fabExportUserDataButton.addEventListener('click', () => {
-        exportUserData();
+        openNewPromptDialogForPage(currentPage);
         closeFabMenu();
     });
 }
@@ -1698,21 +1695,25 @@ document.addEventListener('click', (event) => {
 
 function initializeAppData() {
     return loadBuiltinPrompts().then(defaultPromptList => {
+        if (!HAS_PROMPT_SECTION_SCRIPTS && (!defaultPromptList || defaultPromptList.length === 0)) {
+            console.warn('Nebyla načtena data sekcí. Zkontrolujte, že jsou v index.html připojené scripts prompts/*.js.');
+        }
+
         builtinPrompts = defaultPromptList;
-        const promptState = loadPromptState();
+        const promptState = reconcilePromptStateWithBuiltinPrompts(loadPromptState(), defaultPromptList);
         savePromptStateToStorage(promptState);
         currentSearchTerm = '';
         currentCategory = 'all';
         renderPromptsForCurrentPage();
         generateCategories();
-        setPage('library');
+        setPage(TEXT_PROMPTS_PAGE);
         updateXmlOutput();
     });
 }
 
 initializeAppData().catch(error => {
     console.error('Chyba při inicializaci aplikace:', error);
-    setPage('library');
+    setPage(TEXT_PROMPTS_PAGE);
     updateXmlOutput();
 }).finally(() => {
     openStartupPageDialog();

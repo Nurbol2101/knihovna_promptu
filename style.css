@@ -409,19 +409,6 @@ nav {
     display: none;
 }
 
-.fab-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 12000;
-    background: rgba(26, 20, 16, 0.018);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-.fab-backdrop.hidden {
-    display: none;
-}
-
 .fab-button {
     width: 58px;
     height: 58px;
@@ -920,10 +907,12 @@ nav {
 /* Samostatné odsazení karet podle sekce */
 #library-page .prompt-card {
     padding: 50px 20px 20px;
+    min-height: 260px;
 }
 
 .section-prompt-card {
     padding: 50px 20px 20px;
+    min-height: 260px;
 }
 
 #custom-page .prompt-card {
@@ -959,7 +948,12 @@ nav {
     white-space: nowrap;
     font-size: 14px;
     font-weight: 500;
-    color: #f2eadf;
+}
+
+.braced-text {
+    /* Styling for text within curly braces - edit color here */
+    color: #ff4444;
+    font-weight: 600;
 }
 
 .prompt-card button {
@@ -982,10 +976,6 @@ nav {
 
 #library-page .prompt-card button {
     position: absolute;
-}
-
-.section-prompt-card button {
-    position: static;
 }
 
 .edit-button {
@@ -1242,12 +1232,14 @@ body.modal-open {
 .dialog-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 12000;
-    background: rgba(10, 8, 8, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
+    z-index: 14000;
+    background: rgba(10, 8, 8, 0.7);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
 }
 
 .dialog-backdrop.hidden {
@@ -1261,12 +1253,29 @@ body.modal-open {
     text-align: left;
     position: relative;
     padding: 88px 28px 28px;
+    background: rgba(31, 24, 20, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .dialog-panel h2 {
     margin-top: 0;
     margin-bottom: 18px;
     font-size: 30px;
+}
+
+.dialog-backdrop .dialog-panel.prompt-card {
+    cursor: default;
+    transform: none;
+}
+
+.dialog-backdrop .dialog-panel.prompt-card:hover {
+    background: rgba(31, 24, 20, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
 }
 
 .dialog-panel .form-group input,

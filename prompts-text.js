@@ -1,4 +1,5 @@
-[
+window.PROMPT_LIBRARY_SECTIONS = window.PROMPT_LIBRARY_SECTIONS || {};
+window.PROMPT_LIBRARY_SECTIONS.text = [
   {
     "id": "text-daily-briefing-m365",
     "category": "#denní_přehled",
@@ -86,4 +87,4 @@
     "title": "Strategie úklidu doručené pošty",
     "content": "Analyzuj moje doručené e-maily. Navrhni strategii úklidu s doporučením složek, pravidel, filtrů a postupů archivace."
   }
-]
+];

@@ -15,7 +15,7 @@
                 <button class="tree-parent-button active" data-group="prompts" type="button">Prompty</button>
                 <div class="tree-children">
                     <button class="tree-leaf-button" data-group="prompts" data-page="custom" type="button">Vytvořit customní prompt</button>
-                    <button class="tree-leaf-button active" data-group="prompts" data-page="library" type="button">Tvé textové prompty</button>
+                    <button class="tree-leaf-button active" data-group="prompts" data-page="text-prompts" type="button">Tvé textové prompty</button>
                     <button class="tree-leaf-button" data-group="prompts" data-page="presentation" type="button">Prompty pro prezentaci</button>
                     <button class="tree-leaf-button" data-group="prompts" data-page="images" type="button">Prompty pro obrázky</button>
                 </div>
@@ -198,12 +198,7 @@
             <p>Prompty pro generování obrázků, vizuálních stylů, bannerů a produktových mockupů.</p>
         </section>
     </main>
-    <main id="videos-page" class="hidden">
-        <section class="builder-intro">
-            <h2>Videa</h2>
-            <p>Prompty pro videa, storyboardy, krátké klipy a social-first obsah.</p>
-        </section>
-    </main>
+
     <main id="prompt-engineering-theory-page" class="hidden">
         <section class="builder-intro">
             <h2>Teorie promptního inženýrství</h2>
@@ -340,24 +335,28 @@ Formát: Pro každý slide uveď nadpis a 3 krátké odrážky. Do poznámek nap
             </div>
         </section>
     </div>
-    <div id="fab-backdrop" class="fab-backdrop hidden" aria-hidden="true"></div>
     <div class="fab-container" aria-label="Rychlé akce">
         <button id="fab-button" class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu">＋</button>
         <div id="fab-menu" class="fab-menu hidden">
-            <button id="fab-new-prompt" class="fab-menu-item" type="button">Přidat prompt do knihovny</button>
-            <button id="fab-import-userdata" class="fab-menu-item" type="button">Načíst soubor s prompty</button>
-            <button id="fab-export-userdata" class="fab-menu-item" type="button">Exportovat svoje prompty</button>
+            <button id="fab-new-prompt" class="fab-menu-item" type="button">Přidat prompt</button>
         </div>
-        <input type="file" id="import-userdata-input" accept="application/json,.json" class="hidden">
     </div>
         <!-- Patička s metadaty projektu -->
         <footer>
-            <p>Verze: 0.09 (pro release 0.0.2)</p>
-            <p>Poslední commit: 31.03.2025 </p>
+            <p>Verze: 0.1 (release 0.0.2)</p>
+            <p>Poslední commit: 02.06.2025 </p>
             <p>Kontakt: nilyassov@koop.cz </p>
         </footer>
         </div>
     </div>
+    <!-- Načtení dat sekcí promptů -->
+    <script src="prompts-text.js"></script>
+    <script src="prompts-presentation.js"></script>
+    <script src="prompts-images.js"></script>
+    <script src="prompts-agent.js"></script>
+    <script src="prompts-system.js"></script>
+    <script src="prompts-theory.js"></script>
+    <script src="prompts-other.js"></script>
     <!-- Načtení aplikační logiky -->
     <script src="script.js"></script>
 </body>
